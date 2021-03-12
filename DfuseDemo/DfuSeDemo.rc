@@ -137,7 +137,7 @@ BEGIN
     GROUPBOX        "Transferred data size",IDC_STATIC,11,222,137,38
     LTEXT           "00:00:00",IDC_TIME_DURATION,68,272,35,9
     CONTROL         "Verify after download",IDC_VERIFY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,161,242,82,10
-    CONTROL         "Run after download",IDC_RUN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,285,242,82,10
+    CONTROL         "Run after download",IDC_RUN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,285,242,75,10
     LTEXT           "0 KB",IDC_DATA_SIZE,18,236,122,20
     GROUPBOX        "Operation duration",IDC_STATIC,11,261,137,25
     LTEXT           "Supports Upload",IDC_STATIC,25,33,54,8
