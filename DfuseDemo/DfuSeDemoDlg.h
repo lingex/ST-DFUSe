@@ -75,6 +75,7 @@ public:
 	CString	m_TimeDuration;
 	BOOL	m_Verify;
 	BOOL	m_Run;
+	BOOL	m_Auto;
 	CString	m_DataSize;
 	//}}AFX_DATA
 

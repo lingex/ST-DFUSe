@@ -78,6 +78,7 @@
 #define IDC_WRP8_EDIT                   1066
 #define IDC_WRP10_EDIT                  1067
 #define IDC_RUN								1068
+#define IDC_AUTO								1069
 
 // Next default values for new objects
 // 

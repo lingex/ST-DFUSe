@@ -78,6 +78,7 @@ CDfuSeDemoDlg::CDfuSeDemoDlg(CWnd* pParent /*=NULL*/)
 	m_TimeDuration = _T("00:00:00");
 	m_Verify = TRUE;
 	m_Run = TRUE;
+	m_Auto = FALSE;
 	m_DataSize = _T("0 KB(0 Bytes) of 0 KB(0 Bytes)");
 	//}}AFX_DATA_INIT
 
@@ -135,6 +136,7 @@ void CDfuSeDemoDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_TIME_DURATION, m_TimeDuration);
 	DDX_Check(pDX, IDC_VERIFY, m_Verify);
 	DDX_Check(pDX, IDC_RUN, m_Run);
+	DDX_Check(pDX, IDC_AUTO, m_Auto);
 	DDX_Text(pDX, IDC_DATA_SIZE, m_DataSize);
 	//}}AFX_DATA_MAP
 }
@@ -433,6 +435,11 @@ void CDfuSeDemoDlg::Refresh()
 
 	m_CtrlDevices.SetCurSel(Sel);
 	OnSelchangeCombodevices();
+
+	if (m_Auto && Sel != 0)
+	{
+		OnButtonupgrade();
+	}
 }
 
 void CDfuSeDemoDlg::OnCancel()
