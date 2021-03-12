@@ -111,6 +111,7 @@ protected:
 	afx_msg void OnButtonverify();
 	afx_msg void OnDblclkListtargets(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnItemchangedListtargets(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnCheckBox();
 	afx_msg void OnErase();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
@@ -140,6 +141,7 @@ private:
 	HANDLE			m_hDle;
 	WORD			m_TransferSize;
 	int             HidDev_Counter;
+	HANDLE	m_hFileChange;
 
 	void Refresh();
 	void HandleError(PDFUThreadContext pContext);

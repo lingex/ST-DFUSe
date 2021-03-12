@@ -159,6 +159,7 @@ BEGIN_MESSAGE_MAP(CDfuSeDemoDlg, CDialog)
 	ON_BN_CLICKED(IDC_BUTTONVERIFY, OnButtonverify)
 	ON_NOTIFY(NM_DBLCLK, IDC_LISTTARGETS, OnDblclkListtargets)
 	ON_NOTIFY(LVN_ITEMCHANGED, IDC_LISTTARGETS, OnItemchangedListtargets)
+	ON_BN_CLICKED(IDC_AUTO, OnCheckBox)
 	//}}AFX_MSG_MAP
 	ON_WM_DEVICECHANGE()
 END_MESSAGE_MAP()
@@ -1477,6 +1478,15 @@ void CDfuSeDemoDlg::OnButtondownchoose()
 				m_Progress.SetTextForeColour(RGB_BK);
 
 				HandleTxtSuccess("File correctly loaded.");
+
+				if (m_Auto)
+				{
+					m_hFileChange = FindFirstChangeNotificationW(CStringW(m_DownFileName), false, FILE_NOTIFY_CHANGE_LAST_WRITE);
+				}
+				else
+				{
+					FindCloseChangeNotification(m_hFileChange);
+				}
 			}
 		}
 		else
@@ -2397,6 +2407,22 @@ void CDfuSeDemoDlg::OnTimer(UINT_PTR nIDEvent)
 			}
 		}
 	}
+	else
+	{
+		//if (m_Auto)
+		{
+			if (m_hFileChange != INVALID_HANDLE_VALUE)
+			{
+				if (FindNextChangeNotification(m_hFileChange))
+				{
+					if (WaitForSingleObject(m_hFileChange, -1) == 0)
+					{
+						OnButtonupgrade();
+					}
+				}
+			}
+		}
+	}
 	CDialog::OnTimer(nIDEvent);
 }
 
@@ -2922,4 +2948,9 @@ void CDfuSeDemoDlg::OnDblclkListtargets(NMHDR* pNMHDR, LRESULT* pResult)
 void CDfuSeDemoDlg::OnItemchangedListtargets(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	*pResult = 0;
+}
+
+void CDfuSeDemoDlg::OnCheckBox()
+{
+	m_Auto = !m_Auto;
 }
