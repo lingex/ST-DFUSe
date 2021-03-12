@@ -1,4 +1,4 @@
-/******************** (C) COPYRIGHT 2018 STMicroelectronics ********************
+﻿/******************** (C) COPYRIGHT 2018 STMicroelectronics ********************
 * Company            : STMicroelectronics
 * Author             : MCD Application Team
 * Description        : STMicroelectronics Device Firmware Upgrade  Extension Demo
@@ -55,15 +55,15 @@ static GUID GUID_APP = { 0xcb979912, 0x5029, 0x420a, { 0xae, 0xb1, 0x34, 0xfc, 0
 // CDfuSeDemoDlg dialog
 
 
-CTime startTime ;
-CTime endTime ;
+CTime startTime;
+CTime endTime;
 CTimeSpan elapsedTime;
 
 BOOL ReadProtected = FALSE;
-BOOL SupportROP    = FALSE;
+BOOL SupportROP = FALSE;
 int STM32Serie = 0;         // 1 for STM32F1
-                            // 2 for STM32F2
-                            // 3 for STM32L1
+							// 2 for STM32F2
+							// 3 for STM32L1
 
 CDfuSeDemoDlg::CDfuSeDemoDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CDfuSeDemoDlg::IDD, pParent)
@@ -82,18 +82,18 @@ CDfuSeDemoDlg::CDfuSeDemoDlg(CWnd* pParent /*=NULL*/)
 
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 
-	m_OperationCode=NULL;
+	m_OperationCode = NULL;
 	m_pBkBrush = new CBrush(RGB_BK);
 	m_pBkBrushReadOnly = new CBrush(GetSysColor(15));
-	m_pMapping=NULL;
-	m_NbAlternates=0;
-	m_BufferedImage=0;
-	m_CurrentTarget=-1;
+	m_pMapping = NULL;
+	m_NbAlternates = 0;
+	m_BufferedImage = 0;
+	m_CurrentTarget = -1;
 
-	m_HidDevices=NULL;
-	m_HidDevice_Counter=0;
-	m_hDle=NULL;
-	m_OperationCode=NULL;
+	m_HidDevices = NULL;
+	m_HidDevice_Counter = 0;
+	m_hDle = NULL;
+	m_OperationCode = NULL;
 }
 
 void CDfuSeDemoDlg::DoDataExchange(CDataExchange* pDX)
@@ -169,24 +169,24 @@ BOOL CDfuSeDemoDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// Set big icon
 	//SetIcon(m_hIcon, FALSE);		// Set small icon
 
-	m_CtrlDevTargets.InsertColumn(0, "Target Id",LVCFMT_CENTER,60);
-	m_CtrlDevTargets.InsertColumn(1, "Name", LVCFMT_LEFT,160);
-	m_CtrlDevTargets.InsertColumn(2, "Available Sectors (Double Click for more)", LVCFMT_LEFT,210);
-	m_CtrlDevTargets.InsertColumn(3, "", LVCFMT_LEFT,0);
-	
+	m_CtrlDevTargets.InsertColumn(0, "Target Id", LVCFMT_CENTER, 60);
+	m_CtrlDevTargets.InsertColumn(1, "Name", LVCFMT_LEFT, 160);
+	m_CtrlDevTargets.InsertColumn(2, "Available Sectors (Double Click for more)", LVCFMT_LEFT, 210);
+	m_CtrlDevTargets.InsertColumn(3, "", LVCFMT_LEFT, 0);
+
 	ListView_SetExtendedListViewStyle(m_CtrlDevTargets.m_hWnd, LVS_EX_FULLROWSELECT);
 
-	DEV_BROADCAST_DEVICEINTERFACE filter={0};
+	DEV_BROADCAST_DEVICEINTERFACE filter = { 0 };
 
-	filter.dbcc_size=sizeof(filter);
-	filter.dbcc_devicetype=DBT_DEVTYP_DEVICEINTERFACE;
-	filter.dbcc_classguid=GUID_DFU;
+	filter.dbcc_size = sizeof(filter);
+	filter.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
+	filter.dbcc_classguid = GUID_DFU;
 	RegisterDeviceNotification(m_hWnd, (PVOID)&filter, DEVICE_NOTIFY_WINDOW_HANDLE);
-	filter.dbcc_classguid=GUID_APP;
+	filter.dbcc_classguid = GUID_APP;
 	RegisterDeviceNotification(m_hWnd, (PVOID)&filter, DEVICE_NOTIFY_WINDOW_HANDLE);
 	GUID Guid;
 	HidD_GetHidGuid(&Guid);
-	filter.dbcc_classguid=Guid;
+	filter.dbcc_classguid = Guid;
 	RegisterDeviceNotification(m_hWnd, (PVOID)&filter, DEVICE_NOTIFY_WINDOW_HANDLE);
 
 	m_Progress.SetShowText(FALSE);
@@ -194,18 +194,18 @@ BOOL CDfuSeDemoDlg::OnInitDialog()
 	m_Progress.SetPos(0);
 	SetTimer(1, 300, NULL); // launch the timer that will check operations ongoing
 
-	Refresh();	
+	Refresh();
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
-void CDfuSeDemoDlg::OnPaint() 
+void CDfuSeDemoDlg::OnPaint()
 {
 	if (IsIconic())
 	{
 		CPaintDC dc(this); // device context for painting
 
-		SendMessage(WM_ICONERASEBKGND, (WPARAM) dc.GetSafeHdc(), 0);
+		SendMessage(WM_ICONERASEBKGND, (WPARAM)dc.GetSafeHdc(), 0);
 
 		// Center icon in client rectangle
 		int cxIcon = GetSystemMetrics(SM_CXICON);
@@ -226,7 +226,7 @@ void CDfuSeDemoDlg::OnPaint()
 
 HCURSOR CDfuSeDemoDlg::OnQueryDragIcon()
 {
-	return (HCURSOR) m_hIcon;
+	return (HCURSOR)m_hIcon;
 }
 
 void CDfuSeDemoDlg::FindMyHIDDevice()
@@ -235,21 +235,21 @@ void CDfuSeDemoDlg::FindMyHIDDevice()
 	int i, Index = 0;
 
 	pHid = m_HidDevices;
-	for(i=0;i<int(m_HidDevice_Counter);i++,pHid++)
+	for (i = 0; i<int(m_HidDevice_Counter); i++, pHid++)
 	{
 		PHIDP_VALUE_CAPS	pValue;
 		PHID_DEVICE pWalk;
 
 		pWalk = pHid;	// Initialize pWalk
 
-		
+
 		/* Each device should be tested to check that the device was actually opened */
-		
-		if (INVALID_HANDLE_VALUE == pWalk->HidDevice) { 
 
-			continue;                                   
+		if (INVALID_HANDLE_VALUE == pWalk->HidDevice) {
 
-		}                                              
+			continue;
+
+		}
 
 		pValue = pWalk->FeatureValueCaps;
 		// 1st search for the feature report
@@ -257,12 +257,12 @@ void CDfuSeDemoDlg::FindMyHIDDevice()
 		bool HidDetachFound = false;
 		while ((cnt < pWalk->Caps.NumberFeatureValueCaps) /*&& (pValue->UsagePage == ST_PAGE)*/)
 		{
-			if (pValue->UsagePage == VENDOR_USAGE_PAGE) 
+			if (pValue->UsagePage == VENDOR_USAGE_PAGE)
 			{
 				HidDetachFound = true;
 				break;
 			}
-			cnt ++;
+			cnt++;
 			pValue++;
 		}
 
@@ -291,10 +291,10 @@ void CDfuSeDemoDlg::ReleaseHIDMemory()
 {
 	PHID_DEVICE		pHid;
 	int				i;
-	
+
 	if (m_HidDevices)
 	{
-		for(i=0;i<int(m_HidDevice_Counter);i++)
+		for (i = 0; i<int(m_HidDevice_Counter); i++)
 		{
 			pHid = m_HidDevices + m_Tab_Index[i];
 			m_Enum.CloseHidDevice(pHid);
@@ -306,15 +306,15 @@ void CDfuSeDemoDlg::ReleaseHIDMemory()
 
 void CDfuSeDemoDlg::Refresh()
 {
-	int		i,j;
- 
+	int		i, j;
+
 	char	Product[253];
 	CString	Prod, String;
 
-	int Sel=m_CtrlDevices.GetCurSel();
+	int Sel = m_CtrlDevices.GetCurSel();
 	CString LinkCurSel;
 
-	if (Sel!=-1)
+	if (Sel != -1)
 		m_CtrlDFUDevices.GetText(Sel, LinkCurSel);
 
 	HDEVINFO info;
@@ -324,13 +324,13 @@ void CDfuSeDemoDlg::Refresh()
 	m_BtnEnterApp.EnableWindow(FALSE);
 	m_CtrlDevices.ResetContent();
 	m_CtrlDFUDevices.ResetContent();
-	
-	m_OldSelectedTargets.SetSize(max(m_CtrlDevTargets.GetItemCount(), m_OldSelectedTargets.GetSize()));
-	for (i=0;i<m_CtrlDevTargets.GetItemCount();i++)
-	{
-		UINT State=m_CtrlDevTargets.GetItemState(i, TVIS_SELECTED);
 
-		if ( (State & TVIS_SELECTED)==TVIS_SELECTED )
+	m_OldSelectedTargets.SetSize(max(m_CtrlDevTargets.GetItemCount(), m_OldSelectedTargets.GetSize()));
+	for (i = 0; i < m_CtrlDevTargets.GetItemCount(); i++)
+	{
+		UINT State = m_CtrlDevTargets.GetItemState(i, TVIS_SELECTED);
+
+		if ((State & TVIS_SELECTED) == TVIS_SELECTED)
 			m_OldSelectedTargets.SetAt(i, 1);
 		else
 			m_OldSelectedTargets.SetAt(i, 0);
@@ -352,13 +352,13 @@ void CDfuSeDemoDlg::Refresh()
 	{
 		PHID_DEVICE pWalk;
 
-		pWalk = m_HidDevices + m_Tab_Index[i];			
+		pWalk = m_HidDevices + m_Tab_Index[i];
 		if(HidD_GetProductString(pWalk->HidDevice, Product, sizeof(Product)))
 		{
 			for(j=0;j<160;j+=2)
 				Prod += Product[j];
 		}
-		else 
+		else
 			Prod="(Unknown HID Device)";
 
 		String.Format("%s",Prod);
@@ -368,41 +368,41 @@ void CDfuSeDemoDlg::Refresh()
 	}*/  // Commented in Version V3.0.3 and Keep it for customer usage if wanted.
 
 
-    // Continue with DFU devices. DFU devices will be listed after HID ones
-	for (i=0;i<2;i++)
+	// Continue with DFU devices. DFU devices will be listed after HID ones
+	for (i = 0; i < 2; i++)
 	{
 		GUID Guid;
 
-		if (i==0)
-			Guid=GUID_DFU;
-		else if (i==1)
-			Guid=GUID_APP;
+		if (i == 0)
+			Guid = GUID_DFU;
+		else if (i == 1)
+			Guid = GUID_APP;
 		//else
 		//    HidD_GetHidGuid(&Guid);	
 
-		info=SetupDiGetClassDevs(&Guid, NULL, NULL, DIGCF_PRESENT | DIGCF_INTERFACEDEVICE);
-		if (info!=INVALID_HANDLE_VALUE)  
+		info = SetupDiGetClassDevs(&Guid, NULL, NULL, DIGCF_PRESENT | DIGCF_INTERFACEDEVICE);
+		if (info != INVALID_HANDLE_VALUE)
 		{
 			DWORD devIndex;
 			SP_INTERFACE_DEVICE_DATA ifData;
-			ifData.cbSize=sizeof(ifData);
+			ifData.cbSize = sizeof(ifData);
 
-			for (devIndex=0;SetupDiEnumDeviceInterfaces(info, NULL, &Guid, devIndex, &ifData);++devIndex)
+			for (devIndex = 0; SetupDiEnumDeviceInterfaces(info, NULL, &Guid, devIndex, &ifData); ++devIndex)
 			{
 				DWORD needed;
 
 				SetupDiGetDeviceInterfaceDetail(info, &ifData, NULL, 0, &needed, NULL);
 
-				PSP_INTERFACE_DEVICE_DETAIL_DATA detail=(PSP_INTERFACE_DEVICE_DETAIL_DATA)new BYTE[needed];
-				detail->cbSize=sizeof(SP_INTERFACE_DEVICE_DETAIL_DATA);
-				SP_DEVINFO_DATA did={sizeof(SP_DEVINFO_DATA)};
-			
+				PSP_INTERFACE_DEVICE_DETAIL_DATA detail = (PSP_INTERFACE_DEVICE_DETAIL_DATA)new BYTE[needed];
+				detail->cbSize = sizeof(SP_INTERFACE_DEVICE_DETAIL_DATA);
+				SP_DEVINFO_DATA did = { sizeof(SP_DEVINFO_DATA) };
+
 				if (SetupDiGetDeviceInterfaceDetail(info, &ifData, detail, needed, NULL, &did))
 				{
 					// Add the link to the list of all DFU devices
 					CString Tmp;
 
-					Tmp=detail->DevicePath;
+					Tmp = detail->DevicePath;
 					Tmp.MakeUpper();
 					m_CtrlDFUDevices.AddString(Tmp);
 				}
@@ -410,39 +410,39 @@ void CDfuSeDemoDlg::Refresh()
 					m_CtrlDFUDevices.AddString("");
 
 				if (SetupDiGetDeviceRegistryProperty(info, &did, SPDRP_DEVICEDESC, NULL, (PBYTE)Product, 253, NULL))
-					Prod= Product;
+					Prod = Product;
 				else
-					Prod="(Unnamed DFU device)";
+					Prod = "(Unnamed DFU device)";
 				// Add the name of the device
 				m_CtrlDevices.AddString(Prod);
-				delete[] (PBYTE)detail;
+				delete[](PBYTE)detail;
 			}
 			SetupDiDestroyDeviceInfoList(info);
 		}
 	}
 	// Select the one we had before.
-	Sel=0;
-	if (LinkCurSel!="")
+	Sel = 0;
+	if (LinkCurSel != "")
 	{
-		Sel=m_CtrlDFUDevices.FindString(0, LinkCurSel);
-		if (Sel==-1)
-			Sel=0;
+		Sel = m_CtrlDFUDevices.FindString(0, LinkCurSel);
+		if (Sel == -1)
+			Sel = 0;
 	}
 
 	m_CtrlDevices.SetCurSel(Sel);
 	OnSelchangeCombodevices();
 }
 
-void CDfuSeDemoDlg::OnCancel() 
+void CDfuSeDemoDlg::OnCancel()
 {
-	BOOL bStop=TRUE;
+	BOOL bStop = TRUE;
 	DFUThreadContext Context;
 
 	if (m_OperationCode)
 	{
-		bStop=FALSE;
-		if (AfxMessageBox("Operation on-going. Leave anyway ?", MB_OKCANCEL|MB_ICONQUESTION)==IDOK)
-			bStop=TRUE;
+		bStop = FALSE;
+		if (AfxMessageBox("Operation on-going. Leave anyway ?", MB_OKCANCEL | MB_ICONQUESTION) == IDOK)
+			bStop = TRUE;
 	}
 
 	if (bStop)
@@ -455,9 +455,9 @@ void CDfuSeDemoDlg::OnCancel()
 			STDFUFILES_DestroyImage(&m_BufferedImage);
 
 		KillTimer(1);
-		if (m_pMapping!=NULL)
+		if (m_pMapping != NULL)
 			STDFUPRT_DestroyMapping(&m_pMapping);
-		POSITION Pos=m_DetachedDevs.GetStartPosition();
+		POSITION Pos = m_DetachedDevs.GetStartPosition();
 		while (Pos)
 		{
 			CString Key;
@@ -467,8 +467,8 @@ void CDfuSeDemoDlg::OnCancel()
 			delete (PUSB_DEVICE_DESCRIPTOR)Value;
 		}
 		m_DetachedDevs.RemoveAll();
-		m_pMapping=NULL;
-		m_NbAlternates=0;
+		m_pMapping = NULL;
+		m_NbAlternates = 0;
 		CDialog::OnCancel();
 	}
 }
@@ -483,12 +483,12 @@ CString STStringFromCLSID(REFCLSID rclsid)
 	return szCLSID;
 }
 
-void CDfuSeDemoDlg::OnSelchangeCombodevices() 
+void CDfuSeDemoDlg::OnSelchangeCombodevices()
 {
 	SupportROP = FALSE;
-	int Sel=m_CtrlDevices.GetCurSel();
+	int Sel = m_CtrlDevices.GetCurSel();
 	CString	Tmp;
-	BOOL bSuccess=FALSE;
+	BOOL bSuccess = FALSE;
 	HANDLE hDle;
 
 	m_BtnEnterDFU.EnableWindow(FALSE);
@@ -502,21 +502,21 @@ void CDfuSeDemoDlg::OnSelchangeCombodevices()
 	m_CtrlDevVid.SetWindowText("");
 	m_CtrlDevPid.SetWindowText("");
 	m_CtrlDevBcd.SetWindowText("");
-	m_OptCanDnload=FALSE;
-	m_OptCanUpload=FALSE;
-	m_OptCanManifestTolerant=FALSE;
-	m_OptCanDetach=FALSE;
-	m_OptCanAccel=FALSE;
-	if (m_pMapping!=NULL)
+	m_OptCanDnload = FALSE;
+	m_OptCanUpload = FALSE;
+	m_OptCanManifestTolerant = FALSE;
+	m_OptCanDetach = FALSE;
+	m_OptCanAccel = FALSE;
+	if (m_pMapping != NULL)
 		STDFUPRT_DestroyMapping(&m_pMapping);
-	m_pMapping=NULL;
-	m_NbAlternates=0;
+	m_pMapping = NULL;
+	m_NbAlternates = 0;
 	m_OldSelectedTargets.SetSize(max(m_CtrlDevTargets.GetItemCount(), m_OldSelectedTargets.GetSize()));
-	for (int i=0;i<m_CtrlDevTargets.GetItemCount();i++)
+	for (int i = 0; i < m_CtrlDevTargets.GetItemCount(); i++)
 	{
-		UINT State=m_CtrlDevTargets.GetItemState(i, TVIS_SELECTED);
+		UINT State = m_CtrlDevTargets.GetItemState(i, TVIS_SELECTED);
 
-		if ( (State & TVIS_SELECTED)==TVIS_SELECTED )
+		if ((State & TVIS_SELECTED) == TVIS_SELECTED)
 			m_OldSelectedTargets.SetAt(i, 1);
 		else
 			m_OldSelectedTargets.SetAt(i, 0);
@@ -524,53 +524,53 @@ void CDfuSeDemoDlg::OnSelchangeCombodevices()
 	m_CtrlDevTargets.DeleteAllItems();
 
 	UpdateData(FALSE);
-	if (Sel!=LB_ERR)
+	if (Sel != LB_ERR)
 	{
-		if (Sel>=(int)m_HidDevice_Counter)
+		if (Sel >= (int)m_HidDevice_Counter)
 		{
 			m_CtrlDFUDevices.GetText(Sel, m_CurrDFUName);
 			//to be removed
 			//m_BtnEnterDFU.EnableWindow(TRUE);
-		
-			if (STDFU_Open((LPSTR)(LPCSTR)m_CurrDFUName,&hDle)==STDFU_NOERROR)
+
+			if (STDFU_Open((LPSTR)(LPCSTR)m_CurrDFUName, &hDle) == STDFU_NOERROR)
 			{
-				if (STDFU_GetDeviceDescriptor(&hDle, &m_DeviceDesc)==STDFU_NOERROR)
+				if (STDFU_GetDeviceDescriptor(&hDle, &m_DeviceDesc) == STDFU_NOERROR)
 				{
 					UINT Dummy1, Dummy2;
 					// Get its attributes
 					memset(&m_CurrDevDFUDesc, 0, sizeof(m_CurrDevDFUDesc));
-					if (STDFU_GetDFUDescriptor(&hDle, &Dummy1, &Dummy2, &m_CurrDevDFUDesc)==STDFUPRT_NOERROR)
+					if (STDFU_GetDFUDescriptor(&hDle, &Dummy1, &Dummy2, &m_CurrDevDFUDesc) == STDFUPRT_NOERROR)
 					{
-						m_OptCanDnload=FALSE;
-						m_OptCanUpload=FALSE;
-						m_OptCanManifestTolerant=FALSE;
-						m_OptCanDetach=FALSE;
-						m_OptCanAccel=FALSE;
+						m_OptCanDnload = FALSE;
+						m_OptCanUpload = FALSE;
+						m_OptCanManifestTolerant = FALSE;
+						m_OptCanDetach = FALSE;
+						m_OptCanAccel = FALSE;
 						if (m_CurrDevDFUDesc.bmAttributes & ATTR_DNLOAD_CAPABLE)
-							m_OptCanDnload=TRUE;
+							m_OptCanDnload = TRUE;
 						if (m_CurrDevDFUDesc.bmAttributes & ATTR_UPLOAD_CAPABLE)
-							m_OptCanUpload=TRUE;
+							m_OptCanUpload = TRUE;
 						if (m_CurrDevDFUDesc.bmAttributes & ATTR_WILL_DETACH)
-							m_OptCanDetach=TRUE;
+							m_OptCanDetach = TRUE;
 						if (m_CurrDevDFUDesc.bmAttributes & ATTR_MANIFESTATION_TOLERANT)
-							m_OptCanManifestTolerant=TRUE;
+							m_OptCanManifestTolerant = TRUE;
 						if (m_CurrDevDFUDesc.bmAttributes & ATTR_ST_CAN_ACCELERATE)
-							m_OptCanAccel=TRUE;
-		
+							m_OptCanAccel = TRUE;
+
 						UpdateData(FALSE);
 
-						if ( (m_CurrDevDFUDesc.bcdDFUVersion<0x011A) || (m_CurrDevDFUDesc.bcdDFUVersion>=0x0120) )
-						{	
-							if ( m_CurrDevDFUDesc.bcdDFUVersion != 0)
-							HandleTxtError("Bad DFU protocol version. Should be 1.1A");						
+						if ((m_CurrDevDFUDesc.bcdDFUVersion < 0x011A) || (m_CurrDevDFUDesc.bcdDFUVersion >= 0x0120))
+						{
+							if (m_CurrDevDFUDesc.bcdDFUVersion != 0)
+								HandleTxtError("Bad DFU protocol version. Should be 1.1A");
 						}
 						else
 						{
 							// Tries to know if we are in DFU or in Application mode: based on the GUID
-							CString DevGUID=m_CurrDFUName.Right(38);
-							CString DfuGUID=STStringFromCLSID(GUID_DFU);
+							CString DevGUID = m_CurrDFUName.Right(38);
+							CString DfuGUID = STStringFromCLSID(GUID_DFU);
 
-							if (DevGUID.CompareNoCase(DfuGUID)!=0)
+							if (DevGUID.CompareNoCase(DfuGUID) != 0)
 							{
 								// Device in Application Mode
 								Tmp.Format("%04X", m_DeviceDesc.idVendor);
@@ -581,7 +581,7 @@ void CDfuSeDemoDlg::OnSelchangeCombodevices()
 								m_CtrlDevAppBcd.SetWindowText(Tmp);
 								m_BtnEnterDFU.EnableWindow(TRUE);
 								m_BtnEnterApp.EnableWindow(FALSE);
-								bSuccess=TRUE;
+								bSuccess = TRUE;
 							}
 							else
 							{
@@ -593,10 +593,10 @@ void CDfuSeDemoDlg::OnSelchangeCombodevices()
 								Tmp.Format("%04X", m_DeviceDesc.bcdDevice);
 								m_CtrlDevBcd.SetWindowText(Tmp);
 
-								PUSB_DEVICE_DESCRIPTOR Desc=NULL;
+								PUSB_DEVICE_DESCRIPTOR Desc = NULL;
 
-								Desc=(PUSB_DEVICE_DESCRIPTOR)(m_DetachedDevs[m_CurrDFUName]);
-								if ( (Desc) && (Desc->bLength) )
+								Desc = (PUSB_DEVICE_DESCRIPTOR)(m_DetachedDevs[m_CurrDFUName]);
+								if ((Desc) && (Desc->bLength))
 								{
 									Tmp.Format("%04X", Desc->idVendor);
 									m_CtrlDevAppVid.SetWindowText(Tmp);
@@ -606,17 +606,17 @@ void CDfuSeDemoDlg::OnSelchangeCombodevices()
 									m_CtrlDevAppBcd.SetWindowText(Tmp);
 								}
 								// Tries to get the mapping
-								if (STDFUPRT_CreateMappingFromDevice((LPSTR)(LPCSTR)m_CurrDFUName, &m_pMapping, &m_NbAlternates)==STDFUPRT_NOERROR)
+								if (STDFUPRT_CreateMappingFromDevice((LPSTR)(LPCSTR)m_CurrDFUName, &m_pMapping, &m_NbAlternates) == STDFUPRT_NOERROR)
 								{
-								
+
 									m_BtnEnterDFU.EnableWindow(FALSE);
 									m_BtnEnterApp.EnableWindow(TRUE);
 									m_UpFile.GetWindowText(Tmp);
-									m_BtnUpload.EnableWindow((Tmp.GetLength()!=0) && (m_CurrDevDFUDesc.bmAttributes & ATTR_UPLOAD_CAPABLE));
+									m_BtnUpload.EnableWindow((Tmp.GetLength() != 0) && (m_CurrDevDFUDesc.bmAttributes & ATTR_UPLOAD_CAPABLE));
 									m_DownFile.GetWindowText(Tmp);
-									m_BtnUpgrade.EnableWindow((Tmp.GetLength()!=0) && (m_CurrDevDFUDesc.bmAttributes & ATTR_DNLOAD_CAPABLE));
-									m_BtnVerify.EnableWindow((Tmp.GetLength()!=0) && (m_CurrDevDFUDesc.bmAttributes & ATTR_UPLOAD_CAPABLE));
-									bSuccess=TRUE;
+									m_BtnUpgrade.EnableWindow((Tmp.GetLength() != 0) && (m_CurrDevDFUDesc.bmAttributes & ATTR_DNLOAD_CAPABLE));
+									m_BtnVerify.EnableWindow((Tmp.GetLength() != 0) && (m_CurrDevDFUDesc.bmAttributes & ATTR_UPLOAD_CAPABLE));
+									bSuccess = TRUE;
 								}
 								else
 									HandleTxtError("Unable to find or decode device mapping... Bad Firmware");
@@ -634,97 +634,97 @@ void CDfuSeDemoDlg::OnSelchangeCombodevices()
 				{
 					CString ToDisp;
 
-					m_Progress.SetBkColour(RGB_BK);	
+					m_Progress.SetBkColour(RGB_BK);
 					m_Progress.SetTextBkColour(COLOR_UPLOAD_FG);
 					m_Progress.SetForeColour(RGB_BK);
 					m_Progress.SetTextForeColour(COLOR_UPLOAD_FG);
 					HandleTxtSuccess(" ");
-					for (DWORD i=0;i<m_NbAlternates;i++)
+					for (DWORD i = 0; i < m_NbAlternates; i++)
 					{
 
 						ToDisp.Format("%02i", m_pMapping[i].nAlternate);
 
-						int nItem=m_CtrlDevTargets.InsertItem(i, ToDisp);
+						int nItem = m_CtrlDevTargets.InsertItem(i, ToDisp);
 
 						m_CtrlDevTargets.SetItemText(nItem, 1, m_pMapping[i].Name);
 						ToDisp.Format("%i sectors...", m_pMapping[i].NbSectors);
 						m_CtrlDevTargets.SetItemText(nItem, 2, ToDisp);
 						ToDisp.Empty();
-						for (DWORD j=0;j<m_pMapping[i].NbSectors;j++)
+						for (DWORD j = 0; j < m_pMapping[i].NbSectors; j++)
 						{
 							CString Tmp;
 							CString Size;
 							CString MapName = m_pMapping[i].Name;  /* Workaround for Bootloader Firmware */
-				
 
-							if (m_pMapping[i].pSectors[j].dwSectorSize<1024) 
+
+							if (m_pMapping[i].pSectors[j].dwSectorSize < 1024)
 								Size.Format("%i b", m_pMapping[i].pSectors[j].dwSectorSize);
 							else
-							if (m_pMapping[i].pSectors[j].dwSectorSize<1024*1024) 
-								Size.Format("%i Kb", m_pMapping[i].pSectors[j].dwSectorSize/1024);
-							else
-								Size.Format("%i Mb", (m_pMapping[i].pSectors[j].dwSectorSize/1024)/1024);
+								if (m_pMapping[i].pSectors[j].dwSectorSize < 1024 * 1024)
+									Size.Format("%i Kb", m_pMapping[i].pSectors[j].dwSectorSize / 1024);
+								else
+									Size.Format("%i Mb", (m_pMapping[i].pSectors[j].dwSectorSize / 1024) / 1024);
 
-							Tmp.Format("Sector %03i\t0x%08X\t0x%08X\t%s\t", j, m_pMapping[i].pSectors[j].dwStartAddress, m_pMapping[i].pSectors[j].dwStartAddress+m_pMapping[i].pSectors[j].dwSectorSize-1, Size);
-							
-							
+							Tmp.Format("Sector %03i\t0x%08X\t0x%08X\t%s\t", j, m_pMapping[i].pSectors[j].dwStartAddress, m_pMapping[i].pSectors[j].dwStartAddress + m_pMapping[i].pSectors[j].dwSectorSize - 1, Size);
+
+
 							if (m_pMapping[i].pSectors[j].bSectorType & BIT_READABLE)
-								Tmp+="R";
+								Tmp += "R";
 							if (m_pMapping[i].pSectors[j].bSectorType & BIT_WRITEABLE)
-								Tmp+="W";
-							if  (MapName.Compare("Option Bytes  ") != 0 )   //Workaround for FW bootloader descriptor//
-								{
-								 if (m_pMapping[i].pSectors[j].bSectorType & BIT_ERASABLE) 
-									Tmp+="E";
-								}
-							if (j!=m_pMapping[i].NbSectors-1)
-								Tmp+="\n";
-							ToDisp=ToDisp+Tmp;
+								Tmp += "W";
+							if (MapName.Compare("Option Bytes  ") != 0)   //Workaround for FW bootloader descriptor//
+							{
+								if (m_pMapping[i].pSectors[j].bSectorType & BIT_ERASABLE)
+									Tmp += "E";
+							}
+							if (j != m_pMapping[i].NbSectors - 1)
+								Tmp += "\n";
+							ToDisp = ToDisp + Tmp;
 						}
 						m_CtrlDevTargets.SetItemText(nItem, 3, ToDisp);
 					}
 
 #ifdef _VS6_USED
-	                // i redefinition not allowed
+					// i redefinition not allowed
 					unsigned int i;
 #else
-	                unsigned int i;
+					unsigned int i;
 #endif
-					for (i=0;i<m_CtrlDevTargets.GetItemCount();i++)
+					for (i = 0; i < m_CtrlDevTargets.GetItemCount(); i++)
 					{
-						if (i<m_OldSelectedTargets.GetSize())
+						if (i < m_OldSelectedTargets.GetSize())
 						{
 							if (m_OldSelectedTargets.GetAt(i))
 								m_CtrlDevTargets.SetItemState(i, TVIS_SELECTED, TVIS_SELECTED);
 						}
 					}
-					if (m_CtrlDevTargets.GetSelectedCount()==0)
+					if (m_CtrlDevTargets.GetSelectedCount() == 0)
 						m_CtrlDevTargets.SetItemState(0, TVIS_SELECTED, TVIS_SELECTED);
 				}
 
-//=========================================================================================================================
-			
-			    for(int idx=0; idx <2; idx++)
+				//=========================================================================================================================
+
+				for (int idx = 0; idx < 2; idx++)
 				{
 					CString MapName = m_CtrlDevTargets.GetItemText(idx, 1);
 					if (MapName.Compare("Option Bytes  ") == 0)
 					{
 						SupportROP = TRUE;
 
-						if ( m_pMapping[1].pSectors[0].dwStartAddress == 0x1FFFF800)
+						if (m_pMapping[1].pSectors[0].dwStartAddress == 0x1FFFF800)
 						{
-							STM32Serie =1;
-						} 
+							STM32Serie = 1;
+						}
 
-						if ( m_pMapping[1].pSectors[0].dwStartAddress == 0x1FFFC000)
+						if (m_pMapping[1].pSectors[0].dwStartAddress == 0x1FFFC000)
 						{
-							STM32Serie =2;
-						} 
+							STM32Serie = 2;
+						}
 
-						if ( m_pMapping[1].pSectors[0].dwStartAddress == 0x1FF80000)
+						if (m_pMapping[1].pSectors[0].dwStartAddress == 0x1FF80000)
 						{
-							STM32Serie =3;
-						} 
+							STM32Serie = 3;
+						}
 					}
 
 				}
@@ -732,258 +732,258 @@ void CDfuSeDemoDlg::OnSelchangeCombodevices()
 
 
 
-                BYTE User  = 0x00;
-			    BYTE RDP   = 0x00;
+				BYTE User = 0x00;
+				BYTE RDP = 0x00;
 				BYTE Data0 = 0x00;
 				BYTE Data1 = 0x00;
-				BYTE WRP0  = 0x00;
-				BYTE WRP1  = 0x00;
-				BYTE WRP2  = 0x00;
-				BYTE WRP3  = 0x00;
-				BYTE WRP4  = 0x00;
-				BYTE WRP5  = 0x00;
-				BYTE WRP6  = 0x00;
-				BYTE WRP7  = 0x00;
-				BYTE WRP8  = 0x00;
-				BYTE WRP9  = 0x00;
-				BYTE WRP10  = 0x00;
-				BYTE WRP11  = 0x00;
-				DWORD WPR  = 0x00;
-                 
+				BYTE WRP0 = 0x00;
+				BYTE WRP1 = 0x00;
+				BYTE WRP2 = 0x00;
+				BYTE WRP3 = 0x00;
+				BYTE WRP4 = 0x00;
+				BYTE WRP5 = 0x00;
+				BYTE WRP6 = 0x00;
+				BYTE WRP7 = 0x00;
+				BYTE WRP8 = 0x00;
+				BYTE WRP9 = 0x00;
+				BYTE WRP10 = 0x00;
+				BYTE WRP11 = 0x00;
+				DWORD WPR = 0x00;
 
-				if(SupportROP)
+
+				if (SupportROP)
 				{
-					   //--- Check for read protection status ---------------------------------------------
-					   if (STDFU_SelectCurrentConfiguration(&hDle, 0, 0,1)==STDFU_NOERROR)
-					   {
-						   DFUSTATUS DFUStatus;
+					//--- Check for read protection status ---------------------------------------------
+					if (STDFU_SelectCurrentConfiguration(&hDle, 0, 0, 1) == STDFU_NOERROR)
+					{
+						DFUSTATUS DFUStatus;
 
-						   STDFU_Getstatus(&hDle, &DFUStatus);
-						   while(DFUStatus.bState != STATE_DFU_IDLE)
-						   {
+						STDFU_Getstatus(&hDle, &DFUStatus);
+						while (DFUStatus.bState != STATE_DFU_IDLE)
+						{
+							STDFU_Clrstatus(&hDle);
+							STDFU_Getstatus(&hDle, &DFUStatus);
+						}
+
+						LPBYTE m_pBuffer = (LPBYTE)malloc(0x10);
+						memset(m_pBuffer, 0xFF, 0x10);
+
+						m_pBuffer[0] = 0x21;
+						m_pBuffer[1] = 0x00;
+						m_pBuffer[2] = 0x00;
+						m_pBuffer[3] = 0x00;
+						m_pBuffer[4] = 0x08;
+
+						STDFU_Dnload(&hDle, m_pBuffer, 0x05, 0);
+
+						STDFU_Getstatus(&hDle, &DFUStatus);
+						while (DFUStatus.bState != STATE_DFU_IDLE)
+						{
+							STDFU_Clrstatus(&hDle);
+							STDFU_Getstatus(&hDle, &DFUStatus);
+						}
+
+						if (STDFU_Upload(&hDle, m_pBuffer, 0x10, 2) == STDFU_NOERROR)
+						{
+
+						}
+
+						STDFU_Getstatus(&hDle, &DFUStatus);
+						if (DFUStatus.bState == STATE_DFU_ERROR)
+						{
+							ReadProtected = TRUE;
+						}
+						while (DFUStatus.bState != STATE_DFU_IDLE)
+						{
+							STDFU_Clrstatus(&hDle);
+							STDFU_Getstatus(&hDle, &DFUStatus);
+						}
+
+					}
+
+					HandleTxtError("Device is Protected...");
+
+					//--- Get Options Bytes DATA ------------------------------------------------------------------
+
+					if ((!ReadProtected) && (STM32Serie == 1))
+					{
+						LPBYTE m_pBuffer = (LPBYTE)malloc(64);
+						memset(m_pBuffer, 0x00, 64);
+
+						if (STDFU_SelectCurrentConfiguration(&hDle, 0, 0, 1) == STDFU_NOERROR)
+						{
+							DFUSTATUS DFUStatus;
+
+							STDFU_Getstatus(&hDle, &DFUStatus);
+							while (DFUStatus.bState != STATE_DFU_IDLE)
+							{
 								STDFU_Clrstatus(&hDle);
 								STDFU_Getstatus(&hDle, &DFUStatus);
-						   }
-							
-						   LPBYTE m_pBuffer = (LPBYTE)malloc(0x10);
-						   memset(m_pBuffer, 0xFF, 0x10);
+							}
 
-						   m_pBuffer[0] = 0x21;
-						   m_pBuffer[1] = 0x00;
-						   m_pBuffer[2] = 0x00;
-						   m_pBuffer[3] = 0x00;
-						   m_pBuffer[4] = 0x08;
+							m_pBuffer[0] = 0x21;
+							m_pBuffer[1] = 0x00;
+							m_pBuffer[2] = 0xF8;
+							m_pBuffer[3] = 0xFF;
+							m_pBuffer[4] = 0x1F;
 
-						   STDFU_Dnload(&hDle, m_pBuffer, 0x05, 0);
-						   
-						   STDFU_Getstatus(&hDle, &DFUStatus);
-						   while(DFUStatus.bState != STATE_DFU_IDLE)
-						   {
+							STDFU_Dnload(&hDle, m_pBuffer, 0x05, 0);
+
+							STDFU_Getstatus(&hDle, &DFUStatus);
+							while (DFUStatus.bState != STATE_DFU_IDLE)
+							{
 								STDFU_Clrstatus(&hDle);
 								STDFU_Getstatus(&hDle, &DFUStatus);
-						   }
+							}
 
-						   if(STDFU_Upload(&hDle, m_pBuffer, 0x10, 2) == STDFU_NOERROR)
-						   {
+							if (STDFU_Upload(&hDle, m_pBuffer, 0x10, 2) == STDFU_NOERROR)
+							{
+								RDP = m_pBuffer[0];
+								User = m_pBuffer[2];
+								Data0 = m_pBuffer[4];
+								Data1 = m_pBuffer[6];
+								WRP0 = m_pBuffer[8];
+								WRP1 = m_pBuffer[10];
+								WRP2 = m_pBuffer[12];
+								WRP3 = m_pBuffer[14];
+								WPR = WRP0 + (WRP1 << 8) + (WRP2 << 16) + (WRP3 << 24);
+							}
+						}
+					}
+					//-----------------------------------------------------------------------------------
+					if ((!ReadProtected) && (STM32Serie == 2))
+					{
+						LPBYTE m_pBuffer = (LPBYTE)malloc(64);
+						memset(m_pBuffer, 0x00, 64);
 
-						   }
+						if (STDFU_SelectCurrentConfiguration(&hDle, 0, 0, 1) == STDFU_NOERROR)
+						{
+							DFUSTATUS DFUStatus;
 
-						   STDFU_Getstatus(&hDle, &DFUStatus);
-						   if(DFUStatus.bState == STATE_DFU_ERROR)
-						   {
-								ReadProtected = TRUE;
-						   }
-						   while(DFUStatus.bState != STATE_DFU_IDLE)
-						   {
+							STDFU_Getstatus(&hDle, &DFUStatus);
+							while (DFUStatus.bState != STATE_DFU_IDLE)
+							{
 								STDFU_Clrstatus(&hDle);
 								STDFU_Getstatus(&hDle, &DFUStatus);
-						   }
+							}
 
-					   }
+							m_pBuffer[0] = 0x21;
+							m_pBuffer[1] = 0x00;
+							m_pBuffer[2] = 0xC0;
+							m_pBuffer[3] = 0xFF;
+							m_pBuffer[4] = 0x1F;
 
-					   HandleTxtError("Device is Protected...");
-					   
-					   //--- Get Options Bytes DATA ------------------------------------------------------------------
-					   
-					   if((! ReadProtected) && (STM32Serie == 1))
-					   {
-						   LPBYTE m_pBuffer = (LPBYTE) malloc(64);
-						   memset(m_pBuffer, 0x00, 64);
-   
-						   if (STDFU_SelectCurrentConfiguration(&hDle, 0, 0,1)==STDFU_NOERROR)
-						   {
-							   DFUSTATUS DFUStatus;
+							STDFU_Dnload(&hDle, m_pBuffer, 0x05, 0);
 
-							   STDFU_Getstatus(&hDle, &DFUStatus);
-							   while(DFUStatus.bState != STATE_DFU_IDLE)
-							   {
-									STDFU_Clrstatus(&hDle);
-									STDFU_Getstatus(&hDle, &DFUStatus);
-							   }
-								   
-							   m_pBuffer[0] = 0x21;
-							   m_pBuffer[1] = 0x00;
-							   m_pBuffer[2] = 0xF8;
-							   m_pBuffer[3] = 0xFF;
-							   m_pBuffer[4] = 0x1F;
+							STDFU_Getstatus(&hDle, &DFUStatus);
+							while (DFUStatus.bState != STATE_DFU_IDLE)
+							{
+								STDFU_Clrstatus(&hDle);
+								STDFU_Getstatus(&hDle, &DFUStatus);
+							}
 
-							   STDFU_Dnload(&hDle, m_pBuffer, 0x05, 0);
-							   
-							   STDFU_Getstatus(&hDle, &DFUStatus);
-							   while(DFUStatus.bState != STATE_DFU_IDLE)
-							   {
-									STDFU_Clrstatus(&hDle);
-									STDFU_Getstatus(&hDle, &DFUStatus);
-							   }
+							if (STDFU_Upload(&hDle, m_pBuffer, 0x10, 2) == STDFU_NOERROR)
+							{
+								RDP = m_pBuffer[1];
+								User = m_pBuffer[0];
 
-							   if(STDFU_Upload(&hDle, m_pBuffer, 0x10, 2) == STDFU_NOERROR)
-							   {
-								   RDP   = m_pBuffer[0] ;
-								   User  = m_pBuffer[2];
-								   Data0 = m_pBuffer[4];
-								   Data1 = m_pBuffer[6];
-								   WRP0  = m_pBuffer[8];
-								   WRP1  = m_pBuffer[10];
-								   WRP2  = m_pBuffer[12];
-								   WRP3  = m_pBuffer[14];
-								   WPR = WRP0 + (WRP1 << 8) + (WRP2 << 16) + (WRP3 << 24);
-							   }
-						   }
-					   }
-						//-----------------------------------------------------------------------------------
-				     if((! ReadProtected) && (STM32Serie == 2))
-					   {
-						   LPBYTE m_pBuffer = (LPBYTE) malloc(64);
-						   memset(m_pBuffer, 0x00, 64);
-   
-						   if (STDFU_SelectCurrentConfiguration(&hDle, 0, 0,1)==STDFU_NOERROR)
-						   {
-							   DFUSTATUS DFUStatus;
+								WRP0 = m_pBuffer[8];
+								WRP1 = m_pBuffer[9];
 
-							   STDFU_Getstatus(&hDle, &DFUStatus);
-							   while(DFUStatus.bState != STATE_DFU_IDLE)
-							   {
-									STDFU_Clrstatus(&hDle);
-									STDFU_Getstatus(&hDle, &DFUStatus);
-							   }
-								   
-							   m_pBuffer[0] = 0x21;
-							   m_pBuffer[1] = 0x00;
-							   m_pBuffer[2] = 0xC0;
-							   m_pBuffer[3] = 0xFF;
-							   m_pBuffer[4] = 0x1F;
+								WPR = WRP0 + (WRP1 << 8);
+							}
+						}
+					}
+					//-----------------------------------------------------------------------------------
 
-							   STDFU_Dnload(&hDle, m_pBuffer, 0x05, 0);
-							   
-							   STDFU_Getstatus(&hDle, &DFUStatus);
-							   while(DFUStatus.bState != STATE_DFU_IDLE)
-							   {
-									STDFU_Clrstatus(&hDle);
-									STDFU_Getstatus(&hDle, &DFUStatus);
-							   }
-
-							   if(STDFU_Upload(&hDle, m_pBuffer, 0x10, 2) == STDFU_NOERROR)
-							   {
-								   RDP   = m_pBuffer[1] ;
-								   User  = m_pBuffer[0];
-
-								   WRP0  = m_pBuffer[8];
-								   WRP1  = m_pBuffer[9];
-
-								   WPR = WRP0 + (WRP1 << 8);
-							   }
-						   }
-					   }
-						//-----------------------------------------------------------------------------------
-
-					 	//-----------------------------------------------------------------------------------
-				     if((! ReadProtected) && (STM32Serie == 3))    // STM32L1 TO BE DONE !!!!!!!!!!!!!!!
-					   {
-						   LPBYTE m_pBuffer = (LPBYTE) malloc(64);
-						   memset(m_pBuffer, 0x00, 64);
+					//-----------------------------------------------------------------------------------
+					if ((!ReadProtected) && (STM32Serie == 3))    // STM32L1 TO BE DONE !!!!!!!!!!!!!!!
+					{
+						LPBYTE m_pBuffer = (LPBYTE)malloc(64);
+						memset(m_pBuffer, 0x00, 64);
 
 
 
-   
-						   if (STDFU_SelectCurrentConfiguration(&hDle, 0, 0,1)==STDFU_NOERROR)
-						   {
-							   DFUSTATUS DFUStatus;
 
-							   STDFU_Getstatus(&hDle, &DFUStatus);
-							   while(DFUStatus.bState != STATE_DFU_IDLE)
-							   {
-									STDFU_Clrstatus(&hDle);
-									STDFU_Getstatus(&hDle, &DFUStatus);
-							   }
-								   
-							   m_pBuffer[0] = 0x21;
-							   m_pBuffer[1] = 0x00;
-							   m_pBuffer[2] = 0x00;
-							   m_pBuffer[3] = 0xF8;
-							   m_pBuffer[4] = 0x1F;
+						if (STDFU_SelectCurrentConfiguration(&hDle, 0, 0, 1) == STDFU_NOERROR)
+						{
+							DFUSTATUS DFUStatus;
 
-							   STDFU_Dnload(&hDle, m_pBuffer, 0x05, 0);
-							   
-							   STDFU_Getstatus(&hDle, &DFUStatus);
-							   while(DFUStatus.bState != STATE_DFU_IDLE)
-							   {
-									STDFU_Clrstatus(&hDle);
-									STDFU_Getstatus(&hDle, &DFUStatus);
-							   }
+							STDFU_Getstatus(&hDle, &DFUStatus);
+							while (DFUStatus.bState != STATE_DFU_IDLE)
+							{
+								STDFU_Clrstatus(&hDle);
+								STDFU_Getstatus(&hDle, &DFUStatus);
+							}
 
-							   if(STDFU_Upload(&hDle, m_pBuffer, 0x20, 2) == STDFU_NOERROR)
-							   {
-								   RDP   = m_pBuffer[0] ;
-								   User  = m_pBuffer[4];
+							m_pBuffer[0] = 0x21;
+							m_pBuffer[1] = 0x00;
+							m_pBuffer[2] = 0x00;
+							m_pBuffer[3] = 0xF8;
+							m_pBuffer[4] = 0x1F;
 
-								   WRP0  = m_pBuffer[8];
-								   WRP1  = m_pBuffer[9];
-								   WRP2  = m_pBuffer[12];
-								   WRP3  = m_pBuffer[13];
-								   WRP4  = m_pBuffer[16];
-								   WRP5  = m_pBuffer[17];
-								   WRP6  = m_pBuffer[20];
-								   WRP7  = m_pBuffer[21];
-								   WRP8  = m_pBuffer[24];
-								   WRP9  = m_pBuffer[25];
-								   WRP10  = m_pBuffer[28];
-								   WRP11 = m_pBuffer[29];
+							STDFU_Dnload(&hDle, m_pBuffer, 0x05, 0);
+
+							STDFU_Getstatus(&hDle, &DFUStatus);
+							while (DFUStatus.bState != STATE_DFU_IDLE)
+							{
+								STDFU_Clrstatus(&hDle);
+								STDFU_Getstatus(&hDle, &DFUStatus);
+							}
+
+							if (STDFU_Upload(&hDle, m_pBuffer, 0x20, 2) == STDFU_NOERROR)
+							{
+								RDP = m_pBuffer[0];
+								User = m_pBuffer[4];
+
+								WRP0 = m_pBuffer[8];
+								WRP1 = m_pBuffer[9];
+								WRP2 = m_pBuffer[12];
+								WRP3 = m_pBuffer[13];
+								WRP4 = m_pBuffer[16];
+								WRP5 = m_pBuffer[17];
+								WRP6 = m_pBuffer[20];
+								WRP7 = m_pBuffer[21];
+								WRP8 = m_pBuffer[24];
+								WRP9 = m_pBuffer[25];
+								WRP10 = m_pBuffer[28];
+								WRP11 = m_pBuffer[29];
 
 
 
-							   }
-						   }
-					   }
-						//-----------------------------------------------------------------------------------
+							}
+						}
+					}
+					//-----------------------------------------------------------------------------------
 
-				
+
 				}
-//=========================================================================================================================
+				//=========================================================================================================================
 
 				if (bSuccess)
 				{
 					CString ToDisp;
 
-					m_Progress.SetBkColour(RGB_BK);	
+					m_Progress.SetBkColour(RGB_BK);
 					m_Progress.SetTextBkColour(COLOR_UPLOAD_FG);
 					m_Progress.SetForeColour(RGB_BK);
 					m_Progress.SetTextForeColour(COLOR_UPLOAD_FG);
 					HandleTxtSuccess(" ");
-					for (DWORD i=0;i<m_NbAlternates;i++)
+					for (DWORD i = 0; i < m_NbAlternates; i++)
 					{
 
 						ToDisp.Format("%02i", m_pMapping[i].nAlternate);
 
-						int nItem= i; //m_CtrlDevTargets.InsertItem(i, ToDisp);
+						int nItem = i; //m_CtrlDevTargets.InsertItem(i, ToDisp);
 
 						m_CtrlDevTargets.SetItemText(nItem, 1, m_pMapping[i].Name);
 						ToDisp.Format("%i sectors...", m_pMapping[i].NbSectors);
 						m_CtrlDevTargets.SetItemText(nItem, 2, ToDisp);
 						ToDisp.Empty();
-						
+
 						CString MapName = m_pMapping[i].Name;  /* Workaround for Bootloader Firmware */
 
-						
+
 						/*
 //=========================================================================================================================
 						if((SupportROP) && ( STM32Serie == 1))
@@ -995,7 +995,7 @@ void CDfuSeDemoDlg::OnSelchangeCombodevices()
 								else
 									m_pMapping[i].pSectors[j].bSectorType = m_pMapping[i].pSectors[j].bSectorType & 0xFE;
 
-							
+
 								if (i == 0)  //Write protection apply only on Internal Flash , alternate 0 //
 								{
 									BYTE WBIT = 0;
@@ -1012,7 +1012,7 @@ void CDfuSeDemoDlg::OnSelchangeCombodevices()
 									else
 										m_pMapping[i].pSectors[j].bSectorType = m_pMapping[i].pSectors[j].bSectorType & 0xFB;
 								}
-								
+
 							}
 						}
 
@@ -1029,7 +1029,7 @@ void CDfuSeDemoDlg::OnSelchangeCombodevices()
 								{
 									BYTE WBIT = 0;
 									WBIT =  (WPR >> j)  & 0x01;
-								
+
 
 									if (WBIT == 1)
 										m_pMapping[i].pSectors[j].bSectorType = m_pMapping[i].pSectors[j].bSectorType | BIT_ERASABLE;
@@ -1041,7 +1041,7 @@ void CDfuSeDemoDlg::OnSelchangeCombodevices()
 									else
 										m_pMapping[i].pSectors[j].bSectorType = m_pMapping[i].pSectors[j].bSectorType & 0xFB;
 								}
-								
+
 							}
 						}
 
@@ -1056,9 +1056,9 @@ void CDfuSeDemoDlg::OnSelchangeCombodevices()
 
 								if (i == 0)  // Write protection apply only on Internal Flash , alternate 0 //
 								{
-									
-																	
-									
+
+
+
 									BYTE WBIT = 0;
 									if  (j < 8)  WBIT =  (WRP0 >> j)  & 0x01;
 									else if (j < 16)  WBIT =  (WRP1 >> (j-8 ))  & 0x01;
@@ -1073,7 +1073,7 @@ void CDfuSeDemoDlg::OnSelchangeCombodevices()
 									else if (j < 88)  WBIT =  (WRP10 >> (j-80))  & 0x01;
 									else if (j < 96)  WBIT =  (WRP11 >> (j-88))  & 0x01;
 
-								
+
 
 
 
@@ -1087,32 +1087,32 @@ void CDfuSeDemoDlg::OnSelchangeCombodevices()
 									else
 										m_pMapping[i].pSectors[j].bSectorType = m_pMapping[i].pSectors[j].bSectorType & 0xFB;
 								}
-								
+
 							}
 						}*/
-//=========================================================================================================================
+						//=========================================================================================================================
 
-					
-						for (int j=0;j<m_pMapping[i].NbSectors;j++)
+
+						for (int j = 0; j < m_pMapping[i].NbSectors; j++)
 						{
 							CString Tmp;
 							CString Size;
-						
 
-							if (m_pMapping[i].pSectors[j].dwSectorSize<1024) 
+
+							if (m_pMapping[i].pSectors[j].dwSectorSize < 1024)
 								Size.Format("%i b", m_pMapping[i].pSectors[j].dwSectorSize);
 							else
-							if (m_pMapping[i].pSectors[j].dwSectorSize<1024*1024) 
-								Size.Format("%i Kb", m_pMapping[i].pSectors[j].dwSectorSize/1024);
-							else
-								Size.Format("%i Mb", (m_pMapping[i].pSectors[j].dwSectorSize/1024)/1024);
+								if (m_pMapping[i].pSectors[j].dwSectorSize < 1024 * 1024)
+									Size.Format("%i Kb", m_pMapping[i].pSectors[j].dwSectorSize / 1024);
+								else
+									Size.Format("%i Mb", (m_pMapping[i].pSectors[j].dwSectorSize / 1024) / 1024);
 
-							Tmp.Format("Sector %03i\t0x%08X\t0x%08X\t%s\t", j, m_pMapping[i].pSectors[j].dwStartAddress, m_pMapping[i].pSectors[j].dwStartAddress+m_pMapping[i].pSectors[j].dwSectorSize-1, Size);
+							Tmp.Format("Sector %03i\t0x%08X\t0x%08X\t%s\t", j, m_pMapping[i].pSectors[j].dwStartAddress, m_pMapping[i].pSectors[j].dwStartAddress + m_pMapping[i].pSectors[j].dwSectorSize - 1, Size);
 							if (m_pMapping[i].pSectors[j].bSectorType & BIT_READABLE)
-								Tmp+="R";
+								Tmp += "R";
 
 							if (m_pMapping[i].pSectors[j].bSectorType & BIT_WRITEABLE)
-								Tmp+="W";		
+								Tmp += "W";
 
 
 							if (MapName.Compare("Option Bytes  ") != 0)   //Workaround for FW bootloader descriptor//
@@ -1120,37 +1120,37 @@ void CDfuSeDemoDlg::OnSelchangeCombodevices()
 								if (m_pMapping[i].pSectors[j].bSectorType & BIT_ERASABLE)
 									Tmp += "E";
 							}
-							
+
 							/*if (m_pMapping[i].pSectors[j].bSectorType & BIT_ERASABLE)
 								Tmp+="E";*/
-							
 
 
-							if (j!=m_pMapping[i].NbSectors-1)
-								Tmp+="\n";
-							ToDisp=ToDisp+Tmp;
+
+							if (j != m_pMapping[i].NbSectors - 1)
+								Tmp += "\n";
+							ToDisp = ToDisp + Tmp;
 						}
 						m_CtrlDevTargets.SetItemText(nItem, 3, ToDisp);
 					}
 
-//=========================================================================================================================
+					//=========================================================================================================================
 
 #ifdef _VS6_USED
-	                // i redefinition not allowed
+					// i redefinition not allowed
 					int i;
 #else
-	                int i;
+					int i;
 #endif
 
-					for (i=0;i<m_CtrlDevTargets.GetItemCount();i++)
+					for (i = 0; i < m_CtrlDevTargets.GetItemCount(); i++)
 					{
-						if (i<m_OldSelectedTargets.GetSize())
+						if (i < m_OldSelectedTargets.GetSize())
 						{
 							if (m_OldSelectedTargets.GetAt(i))
 								m_CtrlDevTargets.SetItemState(i, TVIS_SELECTED, TVIS_SELECTED);
 						}
 					}
-					if (m_CtrlDevTargets.GetSelectedCount()==0)
+					if (m_CtrlDevTargets.GetSelectedCount() == 0)
 						m_CtrlDevTargets.SetItemState(0, TVIS_SELECTED, TVIS_SELECTED);
 				}
 
@@ -1166,27 +1166,27 @@ void CDfuSeDemoDlg::OnSelchangeCombodevices()
 			m_BtnEnterApp.EnableWindow(FALSE);
 
 			pWalk = m_HidDevices + m_Tab_Index[Sel];	// Initialize pWalk
-			Tmp.Format("%04X",(pWalk->Attributes.VendorID));
+			Tmp.Format("%04X", (pWalk->Attributes.VendorID));
 			m_CtrlDevAppVid.SetWindowText(Tmp);
-			Tmp.Format("%04X",(pWalk->Attributes.ProductID));
+			Tmp.Format("%04X", (pWalk->Attributes.ProductID));
 			m_CtrlDevAppPid.SetWindowText(Tmp);
-			Tmp.Format("%04X",(pWalk->Attributes.VersionNumber));
+			Tmp.Format("%04X", (pWalk->Attributes.VersionNumber));
 			m_CtrlDevAppBcd.SetWindowText(Tmp);
 		}
 	}
 }
 
-void CDfuSeDemoDlg::OnButtonenterdfu() 
+void CDfuSeDemoDlg::OnButtonenterdfu()
 {
 	DFUThreadContext Context;
 	CString Tempo;
 	DWORD dwRet;
-	int Sel=m_CtrlDevices.GetCurSel();
+	int Sel = m_CtrlDevices.GetCurSel();
 	//HANDLE hImage;
-    
-	if (Sel!=LB_ERR)
+
+	if (Sel != LB_ERR)
 	{
-		if (Sel<(int)m_HidDevice_Counter)
+		if (Sel < (int)m_HidDevice_Counter)
 		{
 			// HID device -> sending HID detach
 			//--------------------------------------------------------------------------------------
@@ -1202,12 +1202,12 @@ void CDfuSeDemoDlg::OnButtonenterdfu()
 			bool HidDetachFound = false;
 			while ((cnt < pWalk->Caps.NumberFeatureValueCaps) /*&& (pValue->UsagePage == ST_PAGE)*/)
 			{
-				if (pValue->UsagePage == VENDOR_USAGE_PAGE) 
+				if (pValue->UsagePage == VENDOR_USAGE_PAGE)
 				{
 					HidDetachFound = true;
 					break;
 				}
-				cnt ++;
+				cnt++;
 				pValue++;
 			}
 
@@ -1217,21 +1217,21 @@ void CDfuSeDemoDlg::OnButtonenterdfu()
 			{
 				//if (pValue->NotRange.Usage == USAGE_DETACH)
 				//{
-					BYTE Feature[65];
+				BYTE Feature[65];
 
-					Feature[0]=pValue->ReportID;
-					Feature[1]=USAGE_DETACH;
+				Feature[0] = pValue->ReportID;
+				Feature[1] = USAGE_DETACH;
 
-					startTime = CTime::GetCurrentTime();
-					if (!HidD_SetFeature(pWalk->HidDevice, Feature,65))
-						HandleTxtError("Unable to enter DFU mode: Set Feature HID Detach failed !");
-					else
-					{
-						Sleep(5000);
-						HandleTxtSuccess("Successfully entered DFU Mode !");
-						AfxMessageBox("Detach command successful ! Device list refresh will be done...\n\nPlease re-select your device in DFU mode");
-						Refresh();
-					}
+				startTime = CTime::GetCurrentTime();
+				if (!HidD_SetFeature(pWalk->HidDevice, Feature, 65))
+					HandleTxtError("Unable to enter DFU mode: Set Feature HID Detach failed !");
+				else
+				{
+					Sleep(5000);
+					HandleTxtSuccess("Successfully entered DFU Mode !");
+					AfxMessageBox("Detach command successful ! Device list refresh will be done...\n\nPlease re-select your device in DFU mode");
+					Refresh();
+				}
 				//}
 			}
 			else
@@ -1247,24 +1247,24 @@ void CDfuSeDemoDlg::OnButtonenterdfu()
 			m_CtrlDFUDevices.GetText(Sel, m_CurrDFUName);
 
 			lstrcpy(Context.szDevLink, m_CurrDFUName);
-			m_DetachedDev=m_CurrDFUName;
-			pDesc=new USB_DEVICE_DESCRIPTOR;
-			*pDesc=m_DeviceDesc;
-			pDesc->bLength=0; // To recognize this device is about to be detached but not yet
-			m_DetachedDevs.SetAt(m_CurrDFUName, pDesc); 
-			Context.DfuGUID=GUID_DFU;
-			Context.AppGUID=GUID_APP;
-			Context.Operation=OPERATION_DETACH;
-			Context.hImage=NULL;
-		
+			m_DetachedDev = m_CurrDFUName;
+			pDesc = new USB_DEVICE_DESCRIPTOR;
+			*pDesc = m_DeviceDesc;
+			pDesc->bLength = 0; // To recognize this device is about to be detached but not yet
+			m_DetachedDevs.SetAt(m_CurrDFUName, pDesc);
+			Context.DfuGUID = GUID_DFU;
+			Context.AppGUID = GUID_APP;
+			Context.Operation = OPERATION_DETACH;
+			Context.hImage = NULL;
+
 			startTime = CTime::GetCurrentTime();
-			dwRet=STDFUPRT_LaunchOperation(&Context, &m_OperationCode);
-			if (dwRet!=STDFUPRT_NOERROR)
+			dwRet = STDFUPRT_LaunchOperation(&Context, &m_OperationCode);
+			if (dwRet != STDFUPRT_NOERROR)
 			{
-				m_DetachedDev="";
+				m_DetachedDev = "";
 				delete m_DetachedDevs[m_CurrDFUName];
 				m_DetachedDevs.RemoveKey(m_CurrDFUName);
-				Context.ErrorCode=dwRet;
+				Context.ErrorCode = dwRet;
 				HandleError(&Context);
 			}
 			else
@@ -1272,7 +1272,7 @@ void CDfuSeDemoDlg::OnButtonenterdfu()
 				m_Progress.SetPos(0);
 				m_Progress.SetWindowText("");
 				m_Progress.SetShowText(TRUE);
-				m_Progress.SetBkColour(COLOR_RETURN_BG);	
+				m_Progress.SetBkColour(COLOR_RETURN_BG);
 				m_Progress.SetTextBkColour(COLOR_RETURN_BG);
 				m_Progress.SetForeColour(COLOR_RETURN_FG);
 				m_Progress.SetTextForeColour(COLOR_RETURN_FG);
@@ -1290,15 +1290,15 @@ void CDfuSeDemoDlg::OnButtonenterdfu()
 	}
 }
 
-void CDfuSeDemoDlg::OnButtonenterapp() 
+void CDfuSeDemoDlg::OnButtonenterapp()
 {
 	DFUThreadContext Context;
 	CString Tempo;
 	DWORD dwRet;
-	int Sel=m_CtrlDevices.GetCurSel(), TargetSel=m_CtrlDevTargets.GetNextItem(-1, LVIS_SELECTED);
+	int Sel = m_CtrlDevices.GetCurSel(), TargetSel = m_CtrlDevTargets.GetNextItem(-1, LVIS_SELECTED);
 	HANDLE hImage;
 
-	if ( (Sel!=LB_ERR) && (TargetSel!=-1) )
+	if ((Sel != LB_ERR) && (TargetSel != -1))
 	{
 		CString Name;
 
@@ -1306,23 +1306,23 @@ void CDfuSeDemoDlg::OnButtonenterapp()
 		m_CtrlDFUDevices.GetText(Sel, m_CurrDFUName);
 
 		lstrcpy(Context.szDevLink, m_CurrDFUName);
-		m_DetachedDev=m_CurrDFUName;
-		Context.DfuGUID=GUID_DFU;
-		Context.AppGUID=GUID_APP;
-		Context.Operation=OPERATION_RETURN;
-		Name=m_CtrlDevTargets.GetItemText(TargetSel, 1);
-		STDFUFILES_CreateImageFromMapping(&hImage, m_pMapping+TargetSel);
+		m_DetachedDev = m_CurrDFUName;
+		Context.DfuGUID = GUID_DFU;
+		Context.AppGUID = GUID_APP;
+		Context.Operation = OPERATION_RETURN;
+		Name = m_CtrlDevTargets.GetItemText(TargetSel, 1);
+		STDFUFILES_CreateImageFromMapping(&hImage, m_pMapping + TargetSel);
 		STDFUFILES_SetImageName(hImage, (LPSTR)(LPCSTR)Name);
-		STDFUFILES_FilterImageForOperation(hImage, m_pMapping+TargetSel, OPERATION_RETURN, FALSE);
-		Context.hImage=hImage;
-	
+		STDFUFILES_FilterImageForOperation(hImage, m_pMapping + TargetSel, OPERATION_RETURN, FALSE);
+		Context.hImage = hImage;
+
 		startTime = CTime::GetCurrentTime();
 
-		dwRet=STDFUPRT_LaunchOperation(&Context, &m_OperationCode);
-		if (dwRet!=STDFUPRT_NOERROR)
+		dwRet = STDFUPRT_LaunchOperation(&Context, &m_OperationCode);
+		if (dwRet != STDFUPRT_NOERROR)
 		{
-			m_DetachedDev=m_CurrDFUName;
-			Context.ErrorCode=dwRet;
+			m_DetachedDev = m_CurrDFUName;
+			Context.ErrorCode = dwRet;
 			HandleError(&Context);
 		}
 		else
@@ -1330,7 +1330,7 @@ void CDfuSeDemoDlg::OnButtonenterapp()
 			m_Progress.SetPos(0);
 			m_Progress.SetWindowText("");
 			m_Progress.SetShowText(TRUE);
-			m_Progress.SetBkColour(COLOR_RETURN_BG);	
+			m_Progress.SetBkColour(COLOR_RETURN_BG);
 			m_Progress.SetTextBkColour(COLOR_RETURN_BG);
 			m_Progress.SetForeColour(COLOR_RETURN_FG);
 			m_Progress.SetTextForeColour(COLOR_RETURN_FG);
@@ -1347,69 +1347,69 @@ void CDfuSeDemoDlg::OnButtonenterapp()
 	}
 }
 
-void CDfuSeDemoDlg::OnButtonupchoose() 
+void CDfuSeDemoDlg::OnButtonupchoose()
 {
-	TCHAR szFilters[]=
-    "Dfu Files (*.dfu)|*.dfu|All Files (*.*)|*.*||";
+	TCHAR szFilters[] =
+		"Dfu Files (*.dfu)|*.dfu|All Files (*.*)|*.*||";
 	char Path[MAX_PATH];
 	char Tmp[MAX_PATH];
 	char *pTmp;
 
 	GetModuleFileName(NULL, Path, MAX_PATH);
 	strrev(Path);
-	pTmp=strchr(Path, '\\');
+	pTmp = strchr(Path, '\\');
 	strrev(pTmp);
 	lstrcpy(Tmp, pTmp);
 	lstrcpy(Path, Tmp);
 	lstrcat(Path, "*.dfu");
-	
 
-	CFileDialog dlg(FALSE, 
-		            _T("dfu"),_T("*.dfu"),
-					OFN_CREATEPROMPT | OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT,
-					szFilters, this);
-	if (dlg.DoModal()==IDOK)
+
+	CFileDialog dlg(FALSE,
+		_T("dfu"), _T("*.dfu"),
+		OFN_CREATEPROMPT | OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT,
+		szFilters, this);
+	if (dlg.DoModal() == IDOK)
 	{
-		m_UpFileName=dlg.GetPathName();
+		m_UpFileName = dlg.GetPathName();
 		m_UpFile.SetWindowText(dlg.GetFileName());
 		if (!m_BtnEnterDFU.IsWindowEnabled())
 			m_BtnUpload.EnableWindow(m_CurrDevDFUDesc.bmAttributes & ATTR_UPLOAD_CAPABLE);
 	}
 }
 
-void CDfuSeDemoDlg::OnButtondownchoose() 
+void CDfuSeDemoDlg::OnButtondownchoose()
 {
-	TCHAR szFilters[]=
-    "Dfu Files (*.dfu)|*.dfu|All Files (*.*)|*.*||";
+	TCHAR szFilters[] =
+		"Dfu Files (*.dfu)|*.dfu|All Files (*.*)|*.*||";
 	char Path[MAX_PATH];
 	char Tmp[MAX_PATH];
 	char *pTmp;
 
 	GetModuleFileName(NULL, Path, MAX_PATH);
 	strrev(Path);
-	pTmp=strchr(Path, '\\');
+	pTmp = strchr(Path, '\\');
 	strrev(pTmp);
 	lstrcpy(Tmp, pTmp);
 	lstrcpy(Path, Tmp);
 	lstrcat(Path, "*.dfu");
 
-	CFileDialog dlg(TRUE, 
-		            _T("dfu"), _T("*.dfu"),
-					OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST,
-					szFilters, this);
-	if (dlg.DoModal()==IDOK)
+	CFileDialog dlg(TRUE,
+		_T("dfu"), _T("*.dfu"),
+		OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST,
+		szFilters, this);
+	if (dlg.DoModal() == IDOK)
 	{
 		WORD Vid, Pid, Bcd;
 		BYTE NbTargets;
 		HANDLE hFile;
 
-		m_DownFileName=dlg.GetPathName();
+		m_DownFileName = dlg.GetPathName();
 		// Get data from chosen .dfu file
-		if (STDFUFILES_OpenExistingDFUFile((LPSTR)(LPCSTR)m_DownFileName, &hFile, &Vid, &Pid, &Bcd, &NbTargets)==STDFUFILES_NOERROR)
+		if (STDFUFILES_OpenExistingDFUFile((LPSTR)(LPCSTR)m_DownFileName, &hFile, &Vid, &Pid, &Bcd, &NbTargets) == STDFUFILES_NOERROR)
 		{
 			BYTE i;
 			CString Tempo;
-			BOOL bError=FALSE;
+			BOOL bError = FALSE;
 
 			m_CtrlFileTargets.ResetContent();
 
@@ -1420,16 +1420,16 @@ void CDfuSeDemoDlg::OnButtondownchoose()
 			Tempo.Format("%04X", Bcd);
 			m_CtrlFileBcd.SetWindowText(Tempo);
 
-			for (i=0;i<NbTargets;i++)
+			for (i = 0; i < NbTargets; i++)
 			{
 				HANDLE Image;
 				BYTE Alt;
 
-				if (STDFUFILES_ReadImageFromDFUFile(hFile, i, &Image)==STDFUFILES_NOERROR)
+				if (STDFUFILES_ReadImageFromDFUFile(hFile, i, &Image) == STDFUFILES_NOERROR)
 				{
-					if (STDFUFILES_GetImageAlternate(Image, &Alt)==STDFUFILES_NOERROR)
+					if (STDFUFILES_GetImageAlternate(Image, &Alt) == STDFUFILES_NOERROR)
 					{
-						char Name[512]={0};
+						char Name[512] = { 0 };
 
 						STDFUFILES_GetImageName(Image, Name);
 						Tempo.Format("%02i\t%s", Alt, Name);
@@ -1439,7 +1439,7 @@ void CDfuSeDemoDlg::OnButtondownchoose()
 					else
 					{
 						HandleTxtError("Unable to get data from image...");
-						bError=TRUE;
+						bError = TRUE;
 						break;
 					}
 
@@ -1448,7 +1448,7 @@ void CDfuSeDemoDlg::OnButtondownchoose()
 				else
 				{
 					HandleTxtError("Bad file format...");
-					bError=TRUE;
+					bError = TRUE;
 					break;
 				}
 			}
@@ -1462,7 +1462,7 @@ void CDfuSeDemoDlg::OnButtondownchoose()
 					m_BtnUpgrade.EnableWindow(m_CurrDevDFUDesc.bmAttributes & ATTR_DNLOAD_CAPABLE);
 					m_BtnVerify.EnableWindow(m_CurrDevDFUDesc.bmAttributes & ATTR_UPLOAD_CAPABLE);
 				}
-				m_Progress.SetBkColour(COLOR_UPLOAD_FG);	
+				m_Progress.SetBkColour(COLOR_UPLOAD_FG);
 				m_Progress.SetTextBkColour(RGB_BK);
 				m_Progress.SetForeColour(COLOR_UPLOAD_FG);
 				m_Progress.SetTextForeColour(RGB_BK);
@@ -1475,53 +1475,53 @@ void CDfuSeDemoDlg::OnButtondownchoose()
 	}
 }
 
-void CDfuSeDemoDlg::OnButtonupload() 
+void CDfuSeDemoDlg::OnButtonupload()
 {
-	if(ReadProtected)
+	if (ReadProtected)
 	{
-		    if (AfxMessageBox("Your device is read protected.\nWould you remove the read protection?", MB_YESNO |MB_ICONQUESTION)==IDYES)
+		if (AfxMessageBox("Your device is read protected.\nWould you remove the read protection?", MB_YESNO | MB_ICONQUESTION) == IDYES)
+		{
+			HANDLE hdl;
+			if (STDFU_Open((LPSTR)(LPCSTR)m_CurrDFUName, &hdl) == STDFU_NOERROR)
 			{
-				HANDLE hdl;
-                if (STDFU_Open((LPSTR)(LPCSTR)m_CurrDFUName,&hdl)==STDFU_NOERROR)
+				if (STDFU_SelectCurrentConfiguration(&hdl, 0, 0, 1) == STDFU_NOERROR)
 				{
-				   if (STDFU_SelectCurrentConfiguration(&hdl, 0, 0,1)==STDFU_NOERROR)
-				   {
-					   DFUSTATUS DFUStatus;
+					DFUSTATUS DFUStatus;
 
-					   STDFU_Getstatus(&hdl, &DFUStatus);
-					   while(DFUStatus.bState != STATE_DFU_IDLE)
-					   {
-							STDFU_Clrstatus(&hdl);
-							STDFU_Getstatus(&hdl, &DFUStatus);
-					   }
-						 
-					   LPBYTE m_pBuffer = (LPBYTE)malloc(0x10);
-					   memset(m_pBuffer, 0xFF, 0x10);
-					   m_pBuffer[0] = 0x92;    /* Remove Protection*/				
+					STDFU_Getstatus(&hdl, &DFUStatus);
+					while (DFUStatus.bState != STATE_DFU_IDLE)
+					{
+						STDFU_Clrstatus(&hdl);
+						STDFU_Getstatus(&hdl, &DFUStatus);
+					}
 
-					   STDFU_Dnload(&hdl, m_pBuffer, 0x01, 0); 
+					LPBYTE m_pBuffer = (LPBYTE)malloc(0x10);
+					memset(m_pBuffer, 0xFF, 0x10);
+					m_pBuffer[0] = 0x92;    /* Remove Protection*/
 
-					   STDFU_Getstatus(&hdl, &DFUStatus);
-					   /*while(DFUStatus.bState != STATE_DFU_IDLE)
-					   {
-							STDFU_Clrstatus(&hdl);
-							STDFU_Getstatus(&hdl, &DFUStatus);
-					   }*/
-				   }
-				   STDFU_Close(&hdl);
-				   ReadProtected = FALSE;
+					STDFU_Dnload(&hdl, m_pBuffer, 0x01, 0);
+
+					STDFU_Getstatus(&hdl, &DFUStatus);
+					/*while(DFUStatus.bState != STATE_DFU_IDLE)
+					{
+						 STDFU_Clrstatus(&hdl);
+						 STDFU_Getstatus(&hdl, &DFUStatus);
+					}*/
 				}
-
+				STDFU_Close(&hdl);
+				ReadProtected = FALSE;
 			}
-			else 
-				return;
+
+		}
+		else
+			return;
 	}
-	
+
 
 	CString Tempo;
 
-	m_CurrentTarget=m_CtrlDevTargets.GetNextItem(-1, LVIS_SELECTED);
-	if (m_CurrentTarget==-1)
+	m_CurrentTarget = m_CtrlDevTargets.GetNextItem(-1, LVIS_SELECTED);
+	if (m_CurrentTarget == -1)
 	{
 		HandleTxtError("Please select one or several targets before !");
 		return;
@@ -1530,47 +1530,47 @@ void CDfuSeDemoDlg::OnButtonupload()
 	m_CtrlDevAppVid.GetWindowText(Tempo);
 	if (Tempo.IsEmpty())
 	{
-		if (AfxMessageBox("Your device was plugged in DFU mode. \nSo the DFU mode Vid, Pid and Bcd will be put in the .dfu file.\n\nContinue ?", MB_YESNO)!=IDYES)
+		if (AfxMessageBox("Your device was plugged in DFU mode. \nSo the DFU mode Vid, Pid and Bcd will be put in the .dfu file.\n\nContinue ?", MB_YESNO) != IDYES)
 			return;
 	}
 
 	LaunchUpload();
 }
 
-void CDfuSeDemoDlg::LaunchUpload() 
+void CDfuSeDemoDlg::LaunchUpload()
 {
 	DFUThreadContext Context;
 	DWORD dwRet;
-	int TargetSel=m_CurrentTarget;
+	int TargetSel = m_CurrentTarget;
 	HANDLE hImage;
 
 	// prepare the asynchronous operation
 	lstrcpy(Context.szDevLink, m_CurrDFUName);
-	Context.DfuGUID=GUID_DFU;
-	Context.AppGUID=GUID_APP;
-	Context.Operation=OPERATION_UPLOAD;
+	Context.DfuGUID = GUID_DFU;
+	Context.AppGUID = GUID_APP;
+	Context.Operation = OPERATION_UPLOAD;
 	if (m_BufferedImage)
 		STDFUFILES_DestroyImage(&m_BufferedImage);
-	m_BufferedImage=0;
-	
-	CString Name; 
+	m_BufferedImage = 0;
 
-	Name=m_CtrlDevTargets.GetItemText(TargetSel, 1);
-	STDFUFILES_CreateImageFromMapping(&hImage, m_pMapping+TargetSel);
+	CString Name;
+
+	Name = m_CtrlDevTargets.GetItemText(TargetSel, 1);
+	STDFUFILES_CreateImageFromMapping(&hImage, m_pMapping + TargetSel);
 	STDFUFILES_SetImageName(hImage, (LPSTR)(LPCSTR)Name);
-	STDFUFILES_FilterImageForOperation(hImage, m_pMapping+TargetSel, OPERATION_UPLOAD, FALSE);
-	Context.hImage=hImage;
+	STDFUFILES_FilterImageForOperation(hImage, m_pMapping + TargetSel, OPERATION_UPLOAD, FALSE);
+	Context.hImage = hImage;
 
 	startTime = CTime::GetCurrentTime();
 
 	UpdateData(TRUE);
-	m_DataSize.Format("0 KB(0 Bytes) of %i KB(%i Bytes)", STDFUFILES_GetImageSize(Context.hImage)/1024,  STDFUFILES_GetImageSize(Context.hImage));
+	m_DataSize.Format("0 KB(0 Bytes) of %i KB(%i Bytes)", STDFUFILES_GetImageSize(Context.hImage) / 1024, STDFUFILES_GetImageSize(Context.hImage));
 	UpdateData(FALSE);
 
-	dwRet=STDFUPRT_LaunchOperation(&Context, &m_OperationCode);
-	if (dwRet!=STDFUPRT_NOERROR)
+	dwRet = STDFUPRT_LaunchOperation(&Context, &m_OperationCode);
+	if (dwRet != STDFUPRT_NOERROR)
 	{
-		Context.ErrorCode=dwRet;
+		Context.ErrorCode = dwRet;
 		HandleError(&Context);
 	}
 	else
@@ -1578,7 +1578,7 @@ void CDfuSeDemoDlg::LaunchUpload()
 		m_Progress.SetPos(0);
 		m_Progress.SetWindowText("");
 		m_Progress.SetShowText(TRUE);
-		m_Progress.SetBkColour(COLOR_UPLOAD_BG);	
+		m_Progress.SetBkColour(COLOR_UPLOAD_BG);
 		m_Progress.SetTextBkColour(COLOR_UPLOAD_BG);
 		m_Progress.SetForeColour(COLOR_UPLOAD_FG);
 		m_Progress.SetTextForeColour(COLOR_UPLOAD_FG);
@@ -1595,52 +1595,52 @@ void CDfuSeDemoDlg::LaunchUpload()
 	}
 }
 
-void CDfuSeDemoDlg::OnButtonverify() 
+void CDfuSeDemoDlg::OnButtonverify()
 {
-	if(ReadProtected)
+	if (ReadProtected)
 	{
-		    if (AfxMessageBox("Your device is read protected.\nWould you remove the read protection?", MB_YESNO |MB_ICONQUESTION)==IDYES)
+		if (AfxMessageBox("Your device is read protected.\nWould you remove the read protection?", MB_YESNO | MB_ICONQUESTION) == IDYES)
+		{
+			HANDLE hdl;
+			if (STDFU_Open((LPSTR)(LPCSTR)m_CurrDFUName, &hdl) == STDFU_NOERROR)
 			{
-				HANDLE hdl;
-                if (STDFU_Open((LPSTR)(LPCSTR)m_CurrDFUName,&hdl)==STDFU_NOERROR)
+				if (STDFU_SelectCurrentConfiguration(&hdl, 0, 0, 1) == STDFU_NOERROR)
 				{
-				   if (STDFU_SelectCurrentConfiguration(&hdl, 0, 0,1)==STDFU_NOERROR)
-				   {
-					   DFUSTATUS DFUStatus;
+					DFUSTATUS DFUStatus;
 
-					   STDFU_Getstatus(&hdl, &DFUStatus);
-					   while(DFUStatus.bState != STATE_DFU_IDLE)
-					   {
-							STDFU_Clrstatus(&hdl);
-							STDFU_Getstatus(&hdl, &DFUStatus);
-					   }
-						 
-					   LPBYTE m_pBuffer = (LPBYTE)malloc(0x10);
-					   memset(m_pBuffer, 0xFF, 0x10);
-					   m_pBuffer[0] = 0x92;
-					
-					   STDFU_Dnload(&hdl, m_pBuffer, 0x01, 0); 
+					STDFU_Getstatus(&hdl, &DFUStatus);
+					while (DFUStatus.bState != STATE_DFU_IDLE)
+					{
+						STDFU_Clrstatus(&hdl);
+						STDFU_Getstatus(&hdl, &DFUStatus);
+					}
 
-					   STDFU_Getstatus(&hdl, &DFUStatus);
-					   /*while(DFUStatus.bState != STATE_DFU_IDLE)
-					   {
-							STDFU_Clrstatus(&hdl);
-							STDFU_Getstatus(&hdl, &DFUStatus);
-					   }*/
-				   }
-				   STDFU_Close(&hdl);
-				   ReadProtected = FALSE;
+					LPBYTE m_pBuffer = (LPBYTE)malloc(0x10);
+					memset(m_pBuffer, 0xFF, 0x10);
+					m_pBuffer[0] = 0x92;
+
+					STDFU_Dnload(&hdl, m_pBuffer, 0x01, 0);
+
+					STDFU_Getstatus(&hdl, &DFUStatus);
+					/*while(DFUStatus.bState != STATE_DFU_IDLE)
+					{
+						 STDFU_Clrstatus(&hdl);
+						 STDFU_Getstatus(&hdl, &DFUStatus);
+					}*/
 				}
-
+				STDFU_Close(&hdl);
+				ReadProtected = FALSE;
 			}
-			else 
-				return;
+
+		}
+		else
+			return;
 	}
 
 	CString Tempo, DevId, FileId;
 
-	m_CurrentTarget=m_CtrlDevTargets.GetNextItem(-1, LVIS_SELECTED);
-	if (m_CurrentTarget==-1)
+	m_CurrentTarget = m_CtrlDevTargets.GetNextItem(-1, LVIS_SELECTED);
+	if (m_CurrentTarget == -1)
 	{
 		HandleTxtError("Please select one or several targets before !");
 		return;
@@ -1649,24 +1649,24 @@ void CDfuSeDemoDlg::OnButtonverify()
 	m_CtrlDevAppVid.GetWindowText(DevId);
 	if (DevId.IsEmpty())
 	{
-		if (AfxMessageBox("Your device was plugged in DFU mode. \nSo it is impossible to make sure this file is correct for this device.\n\nContinue however ?", MB_YESNO)!=IDYES)
-			return;
+		//if (AfxMessageBox("Your device was plugged in DFU mode. \nSo it is impossible to make sure this file is correct for this device.\n\nContinue however ?", MB_YESNO)!=IDYES)
+			//return;
 	}
 	else
 	{
 		m_CtrlFileVid.GetWindowText(FileId);
-		if (FileId!=DevId)
+		if (FileId != DevId)
 		{
-			if (AfxMessageBox("This file is not supposed to be used with that device.\n\nContinue however ?", MB_YESNO)!=IDYES)
+			if (AfxMessageBox("This file is not supposed to be used with that device.\n\nContinue however ?", MB_YESNO) != IDYES)
 				return;
 		}
 		else
 		{
 			m_CtrlDevAppPid.GetWindowText(DevId);
 			m_CtrlFilePid.GetWindowText(FileId);
-			if (FileId!=DevId)
+			if (FileId != DevId)
 			{
-				if (AfxMessageBox("This file is not supposed to be used with that device.\n\nContinue however ?", MB_YESNO)!=IDYES)
+				if (AfxMessageBox("This file is not supposed to be used with that device.\n\nContinue however ?", MB_YESNO) != IDYES)
 					return;
 			}
 		}
@@ -1676,33 +1676,33 @@ void CDfuSeDemoDlg::OnButtonverify()
 	LaunchVerify();
 }
 
-void CDfuSeDemoDlg::LaunchVerify() 
+void CDfuSeDemoDlg::LaunchVerify()
 {
 	DFUThreadContext Context;
-	BOOL bFound=FALSE;
+	BOOL bFound = FALSE;
 	DWORD dwRet;
-	int i, TargetSel=m_CurrentTarget;
+	int i, TargetSel = m_CurrentTarget;
 	HANDLE hImage;
 	HANDLE hFile;
 	BYTE NbTargets;
 
 	// Get the image of the selected target
-	dwRet=STDFUFILES_OpenExistingDFUFile((LPSTR)(LPCSTR)m_DownFileName, &hFile, NULL, NULL, NULL, &NbTargets);
-	if (dwRet==STDFUFILES_NOERROR)
+	dwRet = STDFUFILES_OpenExistingDFUFile((LPSTR)(LPCSTR)m_DownFileName, &hFile, NULL, NULL, NULL, &NbTargets);
+	if (dwRet == STDFUFILES_NOERROR)
 	{
-		for (i=0;i<NbTargets;i++)
+		for (i = 0; i < NbTargets; i++)
 		{
 			HANDLE Image;
 			BYTE Alt;
 
-			if (STDFUFILES_ReadImageFromDFUFile(hFile, i, &Image)==STDFUFILES_NOERROR)
+			if (STDFUFILES_ReadImageFromDFUFile(hFile, i, &Image) == STDFUFILES_NOERROR)
 			{
-				if (STDFUFILES_GetImageAlternate(Image, &Alt)==STDFUFILES_NOERROR)
+				if (STDFUFILES_GetImageAlternate(Image, &Alt) == STDFUFILES_NOERROR)
 				{
-					if (Alt==TargetSel)
+					if (Alt == TargetSel)
 					{
-						hImage=Image;
-						bFound=TRUE;
+						hImage = Image;
+						bFound = TRUE;
 						break;
 					}
 				}
@@ -1713,7 +1713,7 @@ void CDfuSeDemoDlg::LaunchVerify()
 	}
 	else
 	{
-		Context.ErrorCode=dwRet;
+		Context.ErrorCode = dwRet;
 		HandleError(&Context);
 	}
 
@@ -1726,20 +1726,20 @@ void CDfuSeDemoDlg::LaunchVerify()
 	{
 		// prepare the asynchronous operation
 		lstrcpy(Context.szDevLink, m_CurrDFUName);
-		Context.DfuGUID=GUID_DFU;
-		Context.AppGUID=GUID_APP;
-		Context.Operation=OPERATION_UPLOAD;
+		Context.DfuGUID = GUID_DFU;
+		Context.AppGUID = GUID_APP;
+		Context.Operation = OPERATION_UPLOAD;
 		if (m_BufferedImage)
 			STDFUFILES_DestroyImage(&m_BufferedImage);
-		STDFUFILES_FilterImageForOperation(hImage, m_pMapping+TargetSel, OPERATION_UPLOAD, FALSE);
-		Context.hImage=hImage;
+		STDFUFILES_FilterImageForOperation(hImage, m_pMapping + TargetSel, OPERATION_UPLOAD, FALSE);
+		Context.hImage = hImage;
 		// Let's backup our data before the upload. The data will be used after the upload for comparison
 		STDFUFILES_DuplicateImage(hImage, &m_BufferedImage);
 
-		dwRet=STDFUPRT_LaunchOperation(&Context, &m_OperationCode);
-		if (dwRet!=STDFUPRT_NOERROR)
+		dwRet = STDFUPRT_LaunchOperation(&Context, &m_OperationCode);
+		if (dwRet != STDFUPRT_NOERROR)
 		{
-			Context.ErrorCode=dwRet;
+			Context.ErrorCode = dwRet;
 			HandleError(&Context);
 		}
 		else
@@ -1747,7 +1747,7 @@ void CDfuSeDemoDlg::LaunchVerify()
 			m_Progress.SetPos(0);
 			m_Progress.SetWindowText("");
 			m_Progress.SetShowText(TRUE);
-			m_Progress.SetBkColour(COLOR_UPLOAD_BG);	
+			m_Progress.SetBkColour(COLOR_UPLOAD_BG);
 			m_Progress.SetTextBkColour(COLOR_UPLOAD_BG);
 			m_Progress.SetForeColour(COLOR_UPLOAD_FG);
 			m_Progress.SetTextForeColour(COLOR_UPLOAD_FG);
@@ -1765,55 +1765,55 @@ void CDfuSeDemoDlg::LaunchVerify()
 	}
 }
 
-void CDfuSeDemoDlg::OnButtonupgrade() 
+void CDfuSeDemoDlg::OnButtonupgrade()
 {
-	if(ReadProtected)
+	if (ReadProtected)
 	{
-		    if (AfxMessageBox("Your device is read protected.\nWould you remove the read protection?", MB_YESNO |MB_ICONQUESTION)==IDYES)
+		if (AfxMessageBox("Your device is read protected.\nWould you remove the read protection?", MB_YESNO | MB_ICONQUESTION) == IDYES)
+		{
+			HANDLE hdl;
+			if (STDFU_Open((LPSTR)(LPCSTR)m_CurrDFUName, &hdl) == STDFU_NOERROR)
 			{
-				HANDLE hdl;
-                if (STDFU_Open((LPSTR)(LPCSTR)m_CurrDFUName,&hdl)==STDFU_NOERROR)
+				if (STDFU_SelectCurrentConfiguration(&hdl, 0, 0, 1) == STDFU_NOERROR)
 				{
-				   if (STDFU_SelectCurrentConfiguration(&hdl, 0, 0,1)==STDFU_NOERROR)
-				   {
-					   DFUSTATUS DFUStatus;
+					DFUSTATUS DFUStatus;
 
-					   STDFU_Getstatus(&hdl, &DFUStatus);
-					   while(DFUStatus.bState != STATE_DFU_IDLE)
-					   {
-							STDFU_Clrstatus(&hdl);
-							STDFU_Getstatus(&hdl, &DFUStatus);
-					   }
-						 
-					   LPBYTE m_pBuffer = (LPBYTE)malloc(0x10);
-					   memset(m_pBuffer, 0xFF, 0x10);
-					   m_pBuffer[0] = 0x92;
-					 
+					STDFU_Getstatus(&hdl, &DFUStatus);
+					while (DFUStatus.bState != STATE_DFU_IDLE)
+					{
+						STDFU_Clrstatus(&hdl);
+						STDFU_Getstatus(&hdl, &DFUStatus);
+					}
 
-					   STDFU_Dnload(&hdl, m_pBuffer, 0x01, 0); 
+					LPBYTE m_pBuffer = (LPBYTE)malloc(0x10);
+					memset(m_pBuffer, 0xFF, 0x10);
+					m_pBuffer[0] = 0x92;
 
-					   STDFU_Getstatus(&hdl, &DFUStatus);
-					   /*while(DFUStatus.bState != STATE_DFU_IDLE)
-					   {
-							STDFU_Clrstatus(&hdl);
-							STDFU_Getstatus(&hdl, &DFUStatus);
-					   }*/
-				   }
-				   STDFU_Close(&hdl);
-				   ReadProtected = FALSE;
+
+					STDFU_Dnload(&hdl, m_pBuffer, 0x01, 0);
+
+					STDFU_Getstatus(&hdl, &DFUStatus);
+					/*while(DFUStatus.bState != STATE_DFU_IDLE)
+					{
+						 STDFU_Clrstatus(&hdl);
+						 STDFU_Getstatus(&hdl, &DFUStatus);
+					}*/
 				}
-
+				STDFU_Close(&hdl);
+				ReadProtected = FALSE;
 			}
-			else 
-				return;
+
+		}
+		else
+			return;
 	}
 
 
 	CString Tempo, FileId, DevId;
 
 	UpdateData(TRUE);
-	m_CurrentTarget=m_CtrlDevTargets.GetNextItem(-1, LVIS_SELECTED);
-	if (m_CurrentTarget==-1)
+	m_CurrentTarget = m_CtrlDevTargets.GetNextItem(-1, LVIS_SELECTED);
+	if (m_CurrentTarget == -1)
 	{
 		HandleTxtError("Please select one or several targets before !");
 		return;
@@ -1822,24 +1822,24 @@ void CDfuSeDemoDlg::OnButtonupgrade()
 	m_CtrlDevAppVid.GetWindowText(DevId);
 	if (DevId.IsEmpty())
 	{
-		if (AfxMessageBox("Your device was plugged in DFU mode. \nSo it is impossible to make sure this file is correct for this device.\n\nContinue however ?", MB_YESNO)!=IDYES)
-			return;
+		//if (AfxMessageBox("Your device was plugged in DFU mode. \nSo it is impossible to make sure this file is correct for this device.\n\nContinue however ?", MB_YESNO)!=IDYES)
+			//return;
 	}
 	else
 	{
 		m_CtrlFileVid.GetWindowText(FileId);
-		if (FileId!=DevId)
+		if (FileId != DevId)
 		{
-			if (AfxMessageBox("This file is not supposed to be used with that device.\n\nContinue however ?", MB_YESNO)!=IDYES)
+			if (AfxMessageBox("This file is not supposed to be used with that device.\n\nContinue however ?", MB_YESNO) != IDYES)
 				return;
 		}
 		else
 		{
 			m_CtrlDevAppPid.GetWindowText(DevId);
 			m_CtrlFilePid.GetWindowText(FileId);
-			if (FileId!=DevId)
+			if (FileId != DevId)
 			{
-				if (AfxMessageBox("This file is not supposed to be used with that device.\n\nContinue however ?", MB_YESNO)!=IDYES)
+				if (AfxMessageBox("This file is not supposed to be used with that device.\n\nContinue however ?", MB_YESNO) != IDYES)
 					return;
 			}
 		}
@@ -1850,35 +1850,35 @@ void CDfuSeDemoDlg::OnButtonupgrade()
 	UpdateData(FALSE);
 }
 
-void CDfuSeDemoDlg::LaunchUpgrade() 
+void CDfuSeDemoDlg::LaunchUpgrade()
 {
 	DFUThreadContext Context;
 	HANDLE hFile;
 	BYTE NbTargets;
-	BOOL bFound=FALSE;
+	BOOL bFound = FALSE;
 	DWORD dwRet;
-	int i, TargetSel=m_CurrentTarget;
+	int i, TargetSel = m_CurrentTarget;
 	HANDLE hImage;
-    
-	
+
+
 
 	// Get the image of the selected target
-	dwRet=STDFUFILES_OpenExistingDFUFile((LPSTR)(LPCSTR)m_DownFileName, &hFile, NULL, NULL, NULL, &NbTargets);
-	if (dwRet==STDFUFILES_NOERROR)
+	dwRet = STDFUFILES_OpenExistingDFUFile((LPSTR)(LPCSTR)m_DownFileName, &hFile, NULL, NULL, NULL, &NbTargets);
+	if (dwRet == STDFUFILES_NOERROR)
 	{
-		for (i=0;i<NbTargets;i++)
+		for (i = 0; i < NbTargets; i++)
 		{
 			HANDLE Image;
 			BYTE Alt;
 
-			if (STDFUFILES_ReadImageFromDFUFile(hFile, i, &Image)==STDFUFILES_NOERROR)
+			if (STDFUFILES_ReadImageFromDFUFile(hFile, i, &Image) == STDFUFILES_NOERROR)
 			{
-				if (STDFUFILES_GetImageAlternate(Image, &Alt)==STDFUFILES_NOERROR)
+				if (STDFUFILES_GetImageAlternate(Image, &Alt) == STDFUFILES_NOERROR)
 				{
-					if (Alt==TargetSel)
+					if (Alt == TargetSel)
 					{
-						hImage=Image;
-						bFound=TRUE;
+						hImage = Image;
+						bFound = TRUE;
 						break;
 					}
 				}
@@ -1889,7 +1889,7 @@ void CDfuSeDemoDlg::LaunchUpgrade()
 	}
 	else
 	{
-		Context.ErrorCode=dwRet;
+		Context.ErrorCode = dwRet;
 		HandleError(&Context);
 	}
 
@@ -1902,29 +1902,29 @@ void CDfuSeDemoDlg::LaunchUpgrade()
 	{
 		// prepare the asynchronous operation: first is erase !
 		lstrcpy(Context.szDevLink, m_CurrDFUName);
-		Context.DfuGUID=GUID_DFU;
-		Context.AppGUID=GUID_APP;
-		Context.Operation=OPERATION_ERASE;
-		Context.bDontSendFFTransfersForUpgrade=m_TransferOptimized;
+		Context.DfuGUID = GUID_DFU;
+		Context.AppGUID = GUID_APP;
+		Context.Operation = OPERATION_ERASE;
+		Context.bDontSendFFTransfersForUpgrade = m_TransferOptimized;
 		if (m_BufferedImage)
 			STDFUFILES_DestroyImage(&m_BufferedImage);
 		// Let's backup our data before the filtering for erase. The data will be used for the upgrade phase
 		STDFUFILES_DuplicateImage(hImage, &m_BufferedImage);
-		STDFUFILES_FilterImageForOperation(m_BufferedImage, m_pMapping+TargetSel, OPERATION_UPGRADE, m_TransferOptimized);
+		STDFUFILES_FilterImageForOperation(m_BufferedImage, m_pMapping + TargetSel, OPERATION_UPGRADE, m_TransferOptimized);
 
-		STDFUFILES_FilterImageForOperation(hImage, m_pMapping+TargetSel, OPERATION_ERASE, m_TransferOptimized);
-		Context.hImage=hImage;
+		STDFUFILES_FilterImageForOperation(hImage, m_pMapping + TargetSel, OPERATION_ERASE, m_TransferOptimized);
+		Context.hImage = hImage;
 
 		UpdateData(TRUE);
-		m_DataSize.Format("0 KB(0 Bytes) of %i KB(%i Bytes)", STDFUFILES_GetImageSize(m_BufferedImage)/1024,  STDFUFILES_GetImageSize(m_BufferedImage));
+		m_DataSize.Format("0 KB(0 Bytes) of %i KB(%i Bytes)", STDFUFILES_GetImageSize(m_BufferedImage) / 1024, STDFUFILES_GetImageSize(m_BufferedImage));
 		UpdateData(FALSE);
 
 		startTime = CTime::GetCurrentTime();
 
-		dwRet=STDFUPRT_LaunchOperation(&Context, &m_OperationCode);
-		if (dwRet!=STDFUPRT_NOERROR)
+		dwRet = STDFUPRT_LaunchOperation(&Context, &m_OperationCode);
+		if (dwRet != STDFUPRT_NOERROR)
 		{
-			Context.ErrorCode=dwRet;
+			Context.ErrorCode = dwRet;
 			HandleError(&Context);
 		}
 		else
@@ -1932,7 +1932,7 @@ void CDfuSeDemoDlg::LaunchUpgrade()
 			m_Progress.SetPos(0);
 			m_Progress.SetWindowText("");
 			m_Progress.SetShowText(TRUE);
-			m_Progress.SetBkColour(COLOR_UPGRADE_BG);	
+			m_Progress.SetBkColour(COLOR_UPGRADE_BG);
 			m_Progress.SetTextBkColour(COLOR_UPGRADE_BG);
 			m_Progress.SetForeColour(COLOR_UPGRADE_FG);
 			m_Progress.SetTextForeColour(COLOR_UPGRADE_FG);
@@ -1950,45 +1950,45 @@ void CDfuSeDemoDlg::LaunchUpgrade()
 	}
 }
 
-void CDfuSeDemoDlg::OnTimer(UINT_PTR nIDEvent) 
+void CDfuSeDemoDlg::OnTimer(UINT_PTR nIDEvent)
 {
 	DFUThreadContext Context;
 	CString Tmp;
 	DWORD dwRet;
 
 
-	if (m_OperationCode)  
+	if (m_OperationCode)
 	{
 
 		endTime = CTime::GetCurrentTime();
-        elapsedTime = endTime - startTime;
-    
-	    UpdateData(TRUE);
-	    m_TimeDuration.Format("%.2i:%.2i:%.2i", elapsedTime.GetHours(),elapsedTime.GetMinutes(),elapsedTime.GetSeconds());
-        UpdateData(FALSE);
+		elapsedTime = endTime - startTime;
+
+		UpdateData(TRUE);
+		m_TimeDuration.Format("%.2i:%.2i:%.2i", elapsedTime.GetHours(), elapsedTime.GetMinutes(), elapsedTime.GetSeconds());
+		UpdateData(FALSE);
 
 		CString Tmp, Tmp2;
 
 		// Get the operation status
 		STDFUPRT_GetOperationStatus(m_OperationCode, &Context);
-		
-		if (Context.ErrorCode!=STDFUPRT_NOERROR)
+
+		if (Context.ErrorCode != STDFUPRT_NOERROR)
 		{
 			STDFUPRT_StopOperation(m_OperationCode, &Context);
-			if (Context.Operation==OPERATION_UPGRADE)
-				m_BufferedImage=0;
-			if (Context.Operation==OPERATION_UPLOAD)
+			if (Context.Operation == OPERATION_UPGRADE)
+				m_BufferedImage = 0;
+			if (Context.Operation == OPERATION_UPLOAD)
 			{
-				if (m_BufferedImage!=0) // Verify
+				if (m_BufferedImage != 0) // Verify
 				{
 					STDFUFILES_DestroyImage(&m_BufferedImage);
-					m_BufferedImage=0;
+					m_BufferedImage = 0;
 				}
 			}
 			STDFUFILES_DestroyImage(&Context.hImage);
 
-			m_OperationCode=0;
-			if (Context.ErrorCode==STDFUPRT_UNSUPPORTEDFEATURE)
+			m_OperationCode = 0;
+			if (Context.ErrorCode == STDFUPRT_UNSUPPORTEDFEATURE)
 				AfxMessageBox("This feature is not supported by this firmware.");
 			else
 				HandleError(&Context);
@@ -1997,9 +1997,9 @@ void CDfuSeDemoDlg::OnTimer(UINT_PTR nIDEvent)
 			m_BtnDownChoose.EnableWindow(TRUE);
 
 			// Did we have an error: let's stop all and display the problem
-			if (Context.Operation==OPERATION_DETACH)
+			if (Context.Operation == OPERATION_DETACH)
 			{
-				m_DetachedDev="";
+				m_DetachedDev = "";
 				delete m_DetachedDevs[m_CurrDFUName];
 				m_DetachedDevs.RemoveKey(m_CurrDFUName);
 				m_BtnEnterDFU.EnableWindow(TRUE);
@@ -2007,19 +2007,19 @@ void CDfuSeDemoDlg::OnTimer(UINT_PTR nIDEvent)
 			}
 			else
 			{
-				if (Context.Operation==OPERATION_RETURN)
-					m_DetachedDev="";
+				if (Context.Operation == OPERATION_RETURN)
+					m_DetachedDev = "";
 
 				m_BtnEnterApp.EnableWindow(TRUE);
 				m_CtrlDevTargets.EnableWindow(TRUE);
 				m_UpFile.GetWindowText(Tmp);
-				m_BtnUpload.EnableWindow((Tmp.GetLength()!=0) && (m_CurrDevDFUDesc.bmAttributes & ATTR_UPLOAD_CAPABLE));
+				m_BtnUpload.EnableWindow((Tmp.GetLength() != 0) && (m_CurrDevDFUDesc.bmAttributes & ATTR_UPLOAD_CAPABLE));
 				m_DownFile.GetWindowText(Tmp);
-				m_BtnUpgrade.EnableWindow((Tmp.GetLength()!=0) && (m_CurrDevDFUDesc.bmAttributes & ATTR_DNLOAD_CAPABLE));
-				m_BtnVerify.EnableWindow((Tmp.GetLength()!=0) && (m_CurrDevDFUDesc.bmAttributes & ATTR_UPLOAD_CAPABLE));
+				m_BtnUpgrade.EnableWindow((Tmp.GetLength() != 0) && (m_CurrDevDFUDesc.bmAttributes & ATTR_DNLOAD_CAPABLE));
+				m_BtnVerify.EnableWindow((Tmp.GetLength() != 0) && (m_CurrDevDFUDesc.bmAttributes & ATTR_UPLOAD_CAPABLE));
 				m_BtnAbort.EnableWindow(FALSE);
 			}
-			m_CurrentTarget=-1;
+			m_CurrentTarget = -1;
 			Refresh();
 		}
 		else
@@ -2027,25 +2027,25 @@ void CDfuSeDemoDlg::OnTimer(UINT_PTR nIDEvent)
 			switch (Context.Operation)
 			{
 			case OPERATION_UPLOAD:
-				{
-				  Tmp.Format("Target %02i: Uploading %i%%...", m_CurrentTarget, Context.Percent);
+			{
+				Tmp.Format("Target %02i: Uploading %i%%...", m_CurrentTarget, Context.Percent);
 
-				  UpdateData(TRUE);
-		          m_DataSize.Format("%i KB(%i Bytes) of %i KB(%i Bytes)", ((STDFUFILES_GetImageSize(Context.hImage)/1024)*Context.Percent)/100,  (STDFUFILES_GetImageSize(Context.hImage)*Context.Percent)/100, STDFUFILES_GetImageSize(Context.hImage)/1024,  STDFUFILES_GetImageSize(Context.hImage));
-		          UpdateData(FALSE);
+				UpdateData(TRUE);
+				m_DataSize.Format("%i KB(%i Bytes) of %i KB(%i Bytes)", ((STDFUFILES_GetImageSize(Context.hImage) / 1024)*Context.Percent) / 100, (STDFUFILES_GetImageSize(Context.hImage)*Context.Percent) / 100, STDFUFILES_GetImageSize(Context.hImage) / 1024, STDFUFILES_GetImageSize(Context.hImage));
+				UpdateData(FALSE);
 
-				  break;
-				}
+				break;
+			}
 			case OPERATION_UPGRADE:
-				{
-				  Tmp.Format("Target %02i: Upgrading - Download Phase (%i%%)...", m_CurrentTarget, Context.Percent);
+			{
+				Tmp.Format("Target %02i: Upgrading - Download Phase (%i%%)...", m_CurrentTarget, Context.Percent);
 
-				  UpdateData(TRUE);
-		          m_DataSize.Format("%i KB(%i Bytes) of %i KB(%i Bytes)", ((STDFUFILES_GetImageSize(Context.hImage)/1024)*Context.Percent)/100,  (STDFUFILES_GetImageSize(Context.hImage)*Context.Percent)/100, STDFUFILES_GetImageSize(Context.hImage)/1024,  STDFUFILES_GetImageSize(Context.hImage));
-		          UpdateData(FALSE);
+				UpdateData(TRUE);
+				m_DataSize.Format("%i KB(%i Bytes) of %i KB(%i Bytes)", ((STDFUFILES_GetImageSize(Context.hImage) / 1024)*Context.Percent) / 100, (STDFUFILES_GetImageSize(Context.hImage)*Context.Percent) / 100, STDFUFILES_GetImageSize(Context.hImage) / 1024, STDFUFILES_GetImageSize(Context.hImage));
+				UpdateData(FALSE);
 
-				  break;
-				}
+				break;
+			}
 			case OPERATION_DETACH:
 				Tmp.Format("Detaching %i%%...", Context.Percent);
 				break;
@@ -2059,93 +2059,93 @@ void CDfuSeDemoDlg::OnTimer(UINT_PTR nIDEvent)
 
 			m_Progress.SetWindowText(Tmp);
 			m_Progress.SetPos(Context.Percent);
-			if (Context.Percent==100)
+			if (Context.Percent == 100)
 			{
-				if (Context.Operation==OPERATION_ERASE)
+				if (Context.Operation == OPERATION_ERASE)
 				{
 					// After the erase, relaunch the Upgrade phase !
 					STDFUPRT_StopOperation(m_OperationCode, &Context);
 					STDFUFILES_DestroyImage(&Context.hImage);
 
-					Context.Operation=OPERATION_UPGRADE;
-					Context.hImage=m_BufferedImage;
-					dwRet=STDFUPRT_LaunchOperation(&Context, &m_OperationCode);
-					if (dwRet!=STDFUPRT_NOERROR)
+					Context.Operation = OPERATION_UPGRADE;
+					Context.hImage = m_BufferedImage;
+					dwRet = STDFUPRT_LaunchOperation(&Context, &m_OperationCode);
+					if (dwRet != STDFUPRT_NOERROR)
 					{
-						Context.ErrorCode=dwRet;
+						Context.ErrorCode = dwRet;
 						HandleError(&Context);
 					}
 				}
 				else
 				{
-					BOOL bAllTargetsFinished=TRUE;
+					BOOL bAllTargetsFinished = TRUE;
 
 					STDFUPRT_StopOperation(m_OperationCode, &Context);
 					m_Progress.SetPos(100);
-					m_OperationCode=0;
+					m_OperationCode = 0;
 
-					int Sel=m_CtrlDevices.GetCurSel();
-					if (Context.Operation==OPERATION_RETURN)
+					int Sel = m_CtrlDevices.GetCurSel();
+					if (Context.Operation == OPERATION_RETURN)
 					{
 						delete m_DetachedDevs[m_DetachedDev];
 						m_DetachedDevs.RemoveKey(m_DetachedDev);
-						if (Sel!=-1)
+						if (Sel != -1)
 						{
 							m_CtrlDFUDevices.InsertString(Sel, Context.szDevLink);
-							m_CurrDFUName=Context.szDevLink;
+							m_CurrDFUName = Context.szDevLink;
 						}
 						HandleTxtSuccess("Successfully left DFU mode !");
 					}
-					if (Context.Operation==OPERATION_DETACH) 
+					if (Context.Operation == OPERATION_DETACH)
 					{
-						CString Tmp=Context.szDevLink;
+						CString Tmp = Context.szDevLink;
 
 						Tmp.MakeUpper();
-						m_DetachedDevs[Tmp]=m_DetachedDevs[m_DetachedDev];
-						((PUSB_DEVICE_DESCRIPTOR)(m_DetachedDevs[Tmp]))->bLength=18;
+						m_DetachedDevs[Tmp] = m_DetachedDevs[m_DetachedDev];
+						((PUSB_DEVICE_DESCRIPTOR)(m_DetachedDevs[Tmp]))->bLength = 18;
 						m_DetachedDevs.RemoveKey(m_DetachedDev);
-						if (Sel!=-1)
+						if (Sel != -1)
 						{
 							m_CtrlDFUDevices.InsertString(Sel, Context.szDevLink);
-							m_CurrDFUName=Context.szDevLink;
+							m_CurrDFUName = Context.szDevLink;
 						}
 						HandleTxtSuccess("Successfully detached !");
 					}
-					if (Context.Operation==OPERATION_UPLOAD)
+					if (Context.Operation == OPERATION_UPLOAD)
 					{
-						if (m_BufferedImage==0) // This was a standard Upload
+						if (m_BufferedImage == 0) // This was a standard Upload
 						{
 							HANDLE hFile;
-							PUSB_DEVICE_DESCRIPTOR Desc=NULL;
+							PUSB_DEVICE_DESCRIPTOR Desc = NULL;
 
 							WORD Vid, Pid, Bcd;
 
-							Vid=m_DeviceDesc.idVendor;
-							Pid=m_DeviceDesc.idProduct;
-							Bcd=m_DeviceDesc.bcdDevice;
+							Vid = m_DeviceDesc.idVendor;
+							Pid = m_DeviceDesc.idProduct;
+							Bcd = m_DeviceDesc.bcdDevice;
 
-							Desc=(PUSB_DEVICE_DESCRIPTOR)(m_DetachedDevs[m_CurrDFUName]);
-							if ( (Desc) && (Desc->bLength) )
+							Desc = (PUSB_DEVICE_DESCRIPTOR)(m_DetachedDevs[m_CurrDFUName]);
+							if ((Desc) && (Desc->bLength))
 							{
-								Vid=Desc->idVendor;
-								Pid=Desc->idProduct;
-								Bcd=Desc->bcdDevice;
+								Vid = Desc->idVendor;
+								Pid = Desc->idProduct;
+								Bcd = Desc->bcdDevice;
 							}
 
-							if (m_CtrlDevTargets.GetNextItem(-1, LVIS_SELECTED)==m_CurrentTarget)
-								dwRet=STDFUFILES_CreateNewDFUFile((LPSTR)(LPCSTR)m_UpFileName, &hFile, Vid, Pid, Bcd);
+							if (m_CtrlDevTargets.GetNextItem(-1, LVIS_SELECTED) == m_CurrentTarget)
+								dwRet = STDFUFILES_CreateNewDFUFile((LPSTR)(LPCSTR)m_UpFileName, &hFile, Vid, Pid, Bcd);
 							else
-								dwRet=STDFUFILES_OpenExistingDFUFile((LPSTR)(LPCSTR)m_UpFileName, &hFile, NULL, NULL, NULL, NULL);
-							if (dwRet==STDFUFILES_NOERROR)
+								dwRet = STDFUFILES_OpenExistingDFUFile((LPSTR)(LPCSTR)m_UpFileName, &hFile, NULL, NULL, NULL, NULL);
+							if (dwRet == STDFUFILES_NOERROR)
 							{
-								dwRet=STDFUFILES_AppendImageToDFUFile(hFile, Context.hImage);
-								if (dwRet==STDFUFILES_NOERROR)
+								dwRet = STDFUFILES_AppendImageToDFUFile(hFile, Context.hImage);
+								if (dwRet == STDFUFILES_NOERROR)
 								{
 									HandleTxtSuccess("Upload successful !");
-									m_CurrentTarget=m_CtrlDevTargets.GetNextItem(m_CurrentTarget, LVIS_SELECTED);
-									if (m_CurrentTarget>=0)
+									m_CurrentTarget = m_CtrlDevTargets.GetNextItem(m_CurrentTarget, LVIS_SELECTED);
+									if (m_CurrentTarget >= 0)
 									{
-										bAllTargetsFinished=FALSE;
+										bAllTargetsFinished = FALSE;
 										LaunchUpload();
 									}
 								}
@@ -2159,14 +2159,14 @@ void CDfuSeDemoDlg::OnTimer(UINT_PTR nIDEvent)
 						else // This was a verify
 						{
 							// We need to compare our Two images
-							DWORD i,j;
+							DWORD i, j;
 							DWORD MaxElements;
-							BOOL bDifferent=FALSE, bSuccess=TRUE;
+							BOOL bDifferent = FALSE, bSuccess = TRUE;
 
-							dwRet=STDFUFILES_GetImageNbElement(Context.hImage, &MaxElements);
-							if (dwRet==STDFUFILES_NOERROR)
+							dwRet = STDFUFILES_GetImageNbElement(Context.hImage, &MaxElements);
+							if (dwRet == STDFUFILES_NOERROR)
 							{
-								for (i=0;i<MaxElements;i++)
+								for (i = 0; i < MaxElements; i++)
 								{
 									DFUIMAGEELEMENT ElementRead, ElementSource;
 
@@ -2174,24 +2174,24 @@ void CDfuSeDemoDlg::OnTimer(UINT_PTR nIDEvent)
 									memset(&ElementSource, 0, sizeof(DFUIMAGEELEMENT));
 
 									// Get the Two elements
-									dwRet=STDFUFILES_GetImageElement(Context.hImage, i, &ElementRead);
-									if (dwRet==STDFUFILES_NOERROR)
+									dwRet = STDFUFILES_GetImageElement(Context.hImage, i, &ElementRead);
+									if (dwRet == STDFUFILES_NOERROR)
 									{
-										ElementRead.Data=new BYTE[ElementRead.dwDataLength];
-										dwRet=STDFUFILES_GetImageElement(Context.hImage, i, &ElementRead);
-										if (dwRet==STDFUFILES_NOERROR)
+										ElementRead.Data = new BYTE[ElementRead.dwDataLength];
+										dwRet = STDFUFILES_GetImageElement(Context.hImage, i, &ElementRead);
+										if (dwRet == STDFUFILES_NOERROR)
 										{
-											ElementSource.Data=new BYTE[ElementRead.dwDataLength]; // Should be same lengh in source and read
-											dwRet=STDFUFILES_GetImageElement(m_BufferedImage, i, &ElementSource);
-											if (dwRet==STDFUFILES_NOERROR)
+											ElementSource.Data = new BYTE[ElementRead.dwDataLength]; // Should be same lengh in source and read
+											dwRet = STDFUFILES_GetImageElement(m_BufferedImage, i, &ElementSource);
+											if (dwRet == STDFUFILES_NOERROR)
 											{
-												for (j=0;j<ElementRead.dwDataLength;j++)
+												for (j = 0; j < ElementRead.dwDataLength; j++)
 												{
-													if (ElementSource.Data[j]!=ElementRead.Data[j])
+													if (ElementSource.Data[j] != ElementRead.Data[j])
 													{
-														bDifferent=TRUE;
+														bDifferent = TRUE;
 														HandleTxtError("Reading successful, but data not matching...");   /* Verify changed to Reading  in V3.0.6 */
-														Tmp.Format("Matching not good. First Difference at address 0x%08X:\nFile  byte  is  0x%02X.\nRead byte is 0x%02X.", ElementSource.dwAddress+j, ElementSource.Data[j], ElementRead.Data[j]);
+														Tmp.Format("Matching not good. First Difference at address 0x%08X:\nFile  byte  is  0x%02X.\nRead byte is 0x%02X.", ElementSource.dwAddress + j, ElementSource.Data[j], ElementRead.Data[j]);
 														AfxMessageBox(Tmp);
 														break;
 													}
@@ -2200,7 +2200,7 @@ void CDfuSeDemoDlg::OnTimer(UINT_PTR nIDEvent)
 											else
 											{
 												HandleTxtError("Unable to get data from source image...");
-												bSuccess=FALSE;
+												bSuccess = FALSE;
 												break;
 											}
 											delete[] ElementSource.Data;
@@ -2210,14 +2210,14 @@ void CDfuSeDemoDlg::OnTimer(UINT_PTR nIDEvent)
 										{
 											delete[] ElementRead.Data;
 											HandleTxtError("Unable to get data from read image...");
-											bSuccess=FALSE;
+											bSuccess = FALSE;
 											break;
 										}
 									}
 									else
 									{
 										HandleTxtError("Unable to get data from read image...");
-										bSuccess=FALSE;
+										bSuccess = FALSE;
 										break;
 									}
 									if (bDifferent)
@@ -2227,46 +2227,46 @@ void CDfuSeDemoDlg::OnTimer(UINT_PTR nIDEvent)
 							else
 							{
 								HandleTxtError("Unable to get elements from read image...");
-								bSuccess=FALSE;
+								bSuccess = FALSE;
 							}
 
 							STDFUFILES_DestroyImage(&m_BufferedImage);
-							m_BufferedImage=0;
+							m_BufferedImage = 0;
 							if (bSuccess)
 							{
 								if (!bDifferent)
 									HandleTxtSuccess("Verify successful !");
-								m_CurrentTarget=m_CtrlDevTargets.GetNextItem(m_CurrentTarget, LVIS_SELECTED);
-								if (m_CurrentTarget>=0)
+								m_CurrentTarget = m_CtrlDevTargets.GetNextItem(m_CurrentTarget, LVIS_SELECTED);
+								if (m_CurrentTarget >= 0)
 								{
-									bAllTargetsFinished=FALSE;
+									bAllTargetsFinished = FALSE;
 									LaunchVerify();
 								}
 							}
 						}
 
-					} 
-					if (Context.Operation==OPERATION_UPGRADE)
+					}
+					if (Context.Operation == OPERATION_UPGRADE)
 					{
 						HandleTxtSuccess("Upgrade successful !");
-						m_BufferedImage=0;
-						m_CurrentTarget=m_CtrlDevTargets.GetNextItem(m_CurrentTarget, LVIS_SELECTED);
-						if (m_CurrentTarget>=0)
+						m_BufferedImage = 0;
+						m_CurrentTarget = m_CtrlDevTargets.GetNextItem(m_CurrentTarget, LVIS_SELECTED);
+						if (m_CurrentTarget >= 0)
 						{
-							bAllTargetsFinished=FALSE;
+							bAllTargetsFinished = FALSE;
 							LaunchUpgrade();
 						}
 					}
 					if (bAllTargetsFinished)
 					{
-						if ( (Context.Operation==OPERATION_UPGRADE))
+						if ((Context.Operation == OPERATION_UPGRADE))
 						{
 							if (m_Verify)
 							{
 								// After the upgrade , relaunch the Upgrade verify !
 								CString Tempo, DevId, FileId;
 
-								m_CurrentTarget=m_CtrlDevTargets.GetNextItem(-1, LVIS_SELECTED);
+								m_CurrentTarget = m_CtrlDevTargets.GetNextItem(-1, LVIS_SELECTED);
 								/*if (m_CurrentTarget==-1)
 								{
 									HandleTxtError("Please select one or several targets before !");
@@ -2302,25 +2302,25 @@ void CDfuSeDemoDlg::OnTimer(UINT_PTR nIDEvent)
 								LaunchVerify();
 							}
 						}
-						if ( (Context.Operation==OPERATION_UPLOAD) &&
-							 (m_UpFileName.CompareNoCase(m_DownFileName)==0) )
+						if ((Context.Operation == OPERATION_UPLOAD) &&
+							(m_UpFileName.CompareNoCase(m_DownFileName) == 0))
 						{
 							BYTE NbTargets;
 							HANDLE hFile;
 
 							m_CtrlFileTargets.ResetContent();
-							if (STDFUFILES_OpenExistingDFUFile((LPSTR)(LPCSTR)m_UpFileName, &hFile, NULL, NULL, NULL, &NbTargets)==STDFUFILES_NOERROR)
+							if (STDFUFILES_OpenExistingDFUFile((LPSTR)(LPCSTR)m_UpFileName, &hFile, NULL, NULL, NULL, &NbTargets) == STDFUFILES_NOERROR)
 							{
-								for (int i=0;i<NbTargets;i++)
+								for (int i = 0; i < NbTargets; i++)
 								{
 									HANDLE Image;
 									BYTE Alt;
 									CString Tempo;
 									char Name[MAX_PATH];
 
-									if (STDFUFILES_ReadImageFromDFUFile(hFile, i, &Image)==STDFUFILES_NOERROR)
+									if (STDFUFILES_ReadImageFromDFUFile(hFile, i, &Image) == STDFUFILES_NOERROR)
 									{
-										if (STDFUFILES_GetImageAlternate(Image, &Alt)==STDFUFILES_NOERROR)
+										if (STDFUFILES_GetImageAlternate(Image, &Alt) == STDFUFILES_NOERROR)
 										{
 											STDFUFILES_GetImageName(Image, Name);
 											Tempo.Format("%02i\t%s", Alt, Name);
@@ -2334,7 +2334,7 @@ void CDfuSeDemoDlg::OnTimer(UINT_PTR nIDEvent)
 							}
 						}
 
-						if ( (Context.Operation==OPERATION_DETACH) || (Context.Operation==OPERATION_RETURN) )
+						if ((Context.Operation == OPERATION_DETACH) || (Context.Operation == OPERATION_RETURN))
 						{
 							m_CtrlDevices.EnableWindow(TRUE);
 							m_BtnEnterApp.EnableWindow(TRUE);
@@ -2342,10 +2342,10 @@ void CDfuSeDemoDlg::OnTimer(UINT_PTR nIDEvent)
 							m_BtnDownChoose.EnableWindow(TRUE);
 							m_CtrlDevTargets.EnableWindow(TRUE);
 							m_UpFile.GetWindowText(Tmp);
-							m_BtnUpload.EnableWindow((Tmp.GetLength()!=0) && (m_CurrDevDFUDesc.bmAttributes & ATTR_UPLOAD_CAPABLE));
+							m_BtnUpload.EnableWindow((Tmp.GetLength() != 0) && (m_CurrDevDFUDesc.bmAttributes & ATTR_UPLOAD_CAPABLE));
 							m_DownFile.GetWindowText(Tmp);
-							m_BtnUpgrade.EnableWindow((Tmp.GetLength()!=0) && (m_CurrDevDFUDesc.bmAttributes & ATTR_DNLOAD_CAPABLE));
-							m_BtnVerify.EnableWindow((Tmp.GetLength()!=0) && (m_CurrDevDFUDesc.bmAttributes & ATTR_UPLOAD_CAPABLE));
+							m_BtnUpgrade.EnableWindow((Tmp.GetLength() != 0) && (m_CurrDevDFUDesc.bmAttributes & ATTR_DNLOAD_CAPABLE));
+							m_BtnVerify.EnableWindow((Tmp.GetLength() != 0) && (m_CurrDevDFUDesc.bmAttributes & ATTR_UPLOAD_CAPABLE));
 							m_BtnAbort.EnableWindow(FALSE);
 							Refresh();
 						}
@@ -2357,13 +2357,13 @@ void CDfuSeDemoDlg::OnTimer(UINT_PTR nIDEvent)
 							m_BtnDownChoose.EnableWindow(TRUE);
 							m_CtrlDevTargets.EnableWindow(TRUE);
 							m_UpFile.GetWindowText(Tmp);
-							m_BtnUpload.EnableWindow((Tmp.GetLength()!=0) && (m_CurrDevDFUDesc.bmAttributes & ATTR_UPLOAD_CAPABLE));
+							m_BtnUpload.EnableWindow((Tmp.GetLength() != 0) && (m_CurrDevDFUDesc.bmAttributes & ATTR_UPLOAD_CAPABLE));
 							m_DownFile.GetWindowText(Tmp);
-							m_BtnUpgrade.EnableWindow((Tmp.GetLength()!=0) && (m_CurrDevDFUDesc.bmAttributes & ATTR_DNLOAD_CAPABLE));
-							m_BtnVerify.EnableWindow((Tmp.GetLength()!=0) && (m_CurrDevDFUDesc.bmAttributes & ATTR_UPLOAD_CAPABLE));
+							m_BtnUpgrade.EnableWindow((Tmp.GetLength() != 0) && (m_CurrDevDFUDesc.bmAttributes & ATTR_DNLOAD_CAPABLE));
+							m_BtnVerify.EnableWindow((Tmp.GetLength() != 0) && (m_CurrDevDFUDesc.bmAttributes & ATTR_UPLOAD_CAPABLE));
 							m_BtnAbort.EnableWindow(FALSE);
 						}
-					}					
+					}
 					STDFUFILES_DestroyImage(&Context.hImage);
 				}
 			}
@@ -2376,11 +2376,11 @@ void CDfuSeDemoDlg::HandleTxtError(LPCSTR szTxt)
 {
 	CString Tmp;
 
-	m_Progress.SetBkColour(COLOR_ERROR_BG);	
+	m_Progress.SetBkColour(COLOR_ERROR_BG);
 	m_Progress.SetTextBkColour(COLOR_ERROR_BG);
 	m_Progress.SetForeColour(COLOR_ERROR_FG);
 	m_Progress.SetTextForeColour(COLOR_ERROR_FG);
-	if (m_CurrentTarget>=0)
+	if (m_CurrentTarget >= 0)
 	{
 		Tmp.Format("Target %02i: %s", m_CurrentTarget, szTxt);
 		m_Progress.SetWindowText(Tmp);
@@ -2394,7 +2394,7 @@ void CDfuSeDemoDlg::HandleTxtSuccess(LPCSTR szTxt)
 {
 	CString Tmp;
 
-	if (m_CurrentTarget>=0)
+	if (m_CurrentTarget >= 0)
 	{
 		Tmp.Format("Target %02i: %s", m_CurrentTarget, szTxt);
 		m_Progress.SetWindowText(Tmp);
@@ -2414,228 +2414,228 @@ void CDfuSeDemoDlg::HandleError(PDFUThreadContext pContext)
 	switch (pContext->Operation)
 	{
 	case OPERATION_UPLOAD:
-		Operation="Operation: UPLOAD\n";
+		Operation = "Operation: UPLOAD\n";
 		break;
 	case OPERATION_UPGRADE:
-		Operation="Operation: UPGRADE\n";
+		Operation = "Operation: UPGRADE\n";
 		break;
 	case OPERATION_DETACH:
-		Operation="Operation: DETACH\n";
+		Operation = "Operation: DETACH\n";
 		break;
 	case OPERATION_RETURN:
-		Operation="Operation: RETURN\n";
+		Operation = "Operation: RETURN\n";
 		break;
 	}
 
 	TransferSize.Format("TransferSize: %i\n", pContext->wTransferSize);
-	
+
 	switch (pContext->LastDFUStatus.bState)
 	{
 	case STATE_IDLE:
-		LastDFUStatus+="DFU State: STATE_IDLE\n";
+		LastDFUStatus += "DFU State: STATE_IDLE\n";
 		break;
 	case STATE_DETACH:
-		LastDFUStatus+="DFU State: STATE_DETACH\n";
+		LastDFUStatus += "DFU State: STATE_DETACH\n";
 		break;
 	case STATE_DFU_IDLE:
-		LastDFUStatus+="DFU State: STATE_DFU_IDLE\n";
+		LastDFUStatus += "DFU State: STATE_DFU_IDLE\n";
 		break;
 	case STATE_DFU_DOWNLOAD_SYNC:
-		LastDFUStatus+="DFU State: STATE_DFU_DOWNLOAD_SYNC\n";
+		LastDFUStatus += "DFU State: STATE_DFU_DOWNLOAD_SYNC\n";
 		break;
 	case STATE_DFU_DOWNLOAD_BUSY:
-		LastDFUStatus+="DFU State: STATE_DFU_DOWNLOAD_BUSY\n";
+		LastDFUStatus += "DFU State: STATE_DFU_DOWNLOAD_BUSY\n";
 		break;
 	case STATE_DFU_DOWNLOAD_IDLE:
-		LastDFUStatus+="DFU State: STATE_DFU_DOWNLOAD_IDLE\n";
+		LastDFUStatus += "DFU State: STATE_DFU_DOWNLOAD_IDLE\n";
 		break;
 	case STATE_DFU_MANIFEST_SYNC:
-		LastDFUStatus+="DFU State: STATE_DFU_MANIFEST_SYNC\n";
+		LastDFUStatus += "DFU State: STATE_DFU_MANIFEST_SYNC\n";
 		break;
 	case STATE_DFU_MANIFEST:
-		LastDFUStatus+="DFU State: STATE_DFU_MANIFEST\n";
+		LastDFUStatus += "DFU State: STATE_DFU_MANIFEST\n";
 		break;
 	case STATE_DFU_MANIFEST_WAIT_RESET:
-		LastDFUStatus+="DFU State: STATE_DFU_MANIFEST_WAIT_RESET\n";
+		LastDFUStatus += "DFU State: STATE_DFU_MANIFEST_WAIT_RESET\n";
 		break;
 	case STATE_DFU_UPLOAD_IDLE:
-		LastDFUStatus+="DFU State: STATE_DFU_UPLOAD_IDLE\n";
+		LastDFUStatus += "DFU State: STATE_DFU_UPLOAD_IDLE\n";
 		break;
 	case STATE_DFU_ERROR:
-		LastDFUStatus+="DFU State: STATE_DFU_ERROR\n";
+		LastDFUStatus += "DFU State: STATE_DFU_ERROR\n";
 		break;
 	default:
 		Tmp.Format("DFU State: (Unknown 0x%02X)\n", pContext->LastDFUStatus.bState);
-		LastDFUStatus+=Tmp;
+		LastDFUStatus += Tmp;
 		break;
 	}
 	switch (pContext->LastDFUStatus.bStatus)
 	{
 	case STATUS_OK:
-		LastDFUStatus+="DFU Status: STATUS_OK\n";
+		LastDFUStatus += "DFU Status: STATUS_OK\n";
 		break;
 	case STATUS_errTARGET:
-		LastDFUStatus+="DFU Status: STATUS_errTARGET\n";
+		LastDFUStatus += "DFU Status: STATUS_errTARGET\n";
 		break;
 	case STATUS_errFILE:
-		LastDFUStatus+="DFU Status: STATUS_errFILE\n";
+		LastDFUStatus += "DFU Status: STATUS_errFILE\n";
 		break;
 	case STATUS_errWRITE:
-		LastDFUStatus+="DFU Status: STATUS_errWRITE\n";
+		LastDFUStatus += "DFU Status: STATUS_errWRITE\n";
 		break;
 	case STATUS_errERASE:
-		LastDFUStatus+="DFU Status: STATUS_errERASE\n";
+		LastDFUStatus += "DFU Status: STATUS_errERASE\n";
 		break;
 	case STATUS_errCHECK_ERASE:
-		LastDFUStatus+="DFU Status: STATUS_errCHECK_ERASE\n";
+		LastDFUStatus += "DFU Status: STATUS_errCHECK_ERASE\n";
 		break;
 	case STATUS_errPROG:
-		LastDFUStatus+="DFU Status: STATUS_errPROG\n";
+		LastDFUStatus += "DFU Status: STATUS_errPROG\n";
 		break;
 	case STATUS_errVERIFY:
-		LastDFUStatus+="DFU Status: STATUS_errVERIFY\n";
+		LastDFUStatus += "DFU Status: STATUS_errVERIFY\n";
 		break;
 	case STATUS_errADDRESS:
-		LastDFUStatus+="DFU Status: STATUS_errADDRESS\n";
+		LastDFUStatus += "DFU Status: STATUS_errADDRESS\n";
 		break;
 	case STATUS_errNOTDONE:
-		LastDFUStatus+="DFU Status: STATUS_errNOTDONE\n";
+		LastDFUStatus += "DFU Status: STATUS_errNOTDONE\n";
 		break;
 	case STATUS_errFIRMWARE:
-		LastDFUStatus+="DFU Status: STATUS_errFIRMWARE\n";
+		LastDFUStatus += "DFU Status: STATUS_errFIRMWARE\n";
 		break;
 	case STATUS_errVENDOR:
-		LastDFUStatus+="DFU Status: STATUS_errVENDOR\n";
+		LastDFUStatus += "DFU Status: STATUS_errVENDOR\n";
 		break;
 	case STATUS_errUSBR:
-		LastDFUStatus+="DFU Status: STATUS_errUSBR\n";
+		LastDFUStatus += "DFU Status: STATUS_errUSBR\n";
 		break;
 	case STATUS_errPOR:
-		LastDFUStatus+="DFU Status: STATUS_errPOR\n";
+		LastDFUStatus += "DFU Status: STATUS_errPOR\n";
 		break;
 	case STATUS_errUNKNOWN:
-		LastDFUStatus+="DFU Status: STATUS_errUNKNOWN\n";
+		LastDFUStatus += "DFU Status: STATUS_errUNKNOWN\n";
 		break;
 	case STATUS_errSTALLEDPKT:
-		LastDFUStatus+="DFU Status: STATUS_errSTALLEDPKT\n";
+		LastDFUStatus += "DFU Status: STATUS_errSTALLEDPKT\n";
 		break;
 	default:
 		Tmp.Format("DFU Status: (Unknown 0x%02X)\n", pContext->LastDFUStatus.bStatus);
-		LastDFUStatus+=Tmp;
+		LastDFUStatus += Tmp;
 		break;
 	}
-	
+
 	switch (pContext->CurrentRequest)
 	{
-	case STDFU_RQ_GET_DEVICE_DESCRIPTOR: 
-		CurrentRequest+="Request: Getting Device Descriptor. \n";
+	case STDFU_RQ_GET_DEVICE_DESCRIPTOR:
+		CurrentRequest += "Request: Getting Device Descriptor. \n";
 		break;
 	case STDFU_RQ_GET_DFU_DESCRIPTOR:
-		CurrentRequest+="Request: Getting DFU Descriptor. \n";
+		CurrentRequest += "Request: Getting DFU Descriptor. \n";
 		break;
 	case STDFU_RQ_GET_STRING_DESCRIPTOR:
-		CurrentRequest+="Request: Getting String Descriptor. \n";
+		CurrentRequest += "Request: Getting String Descriptor. \n";
 		break;
 	case STDFU_RQ_GET_NB_OF_CONFIGURATIONS:
-		CurrentRequest+="Request: Getting amount of configurations. \n";
+		CurrentRequest += "Request: Getting amount of configurations. \n";
 		break;
 	case STDFU_RQ_GET_CONFIGURATION_DESCRIPTOR:
-		CurrentRequest+="Request: Getting Configuration Descriptor. \n";
+		CurrentRequest += "Request: Getting Configuration Descriptor. \n";
 		break;
 	case STDFU_RQ_GET_NB_OF_INTERFACES:
-		CurrentRequest+="Request: Getting amount of interfaces. \n";
+		CurrentRequest += "Request: Getting amount of interfaces. \n";
 		break;
 	case STDFU_RQ_GET_NB_OF_ALTERNATES:
-		CurrentRequest+="Request: Getting amount of alternates. \n";
+		CurrentRequest += "Request: Getting amount of alternates. \n";
 		break;
 	case STDFU_RQ_GET_INTERFACE_DESCRIPTOR:
-		CurrentRequest+="Request: Getting interface Descriptor. \n";
+		CurrentRequest += "Request: Getting interface Descriptor. \n";
 		break;
 	case STDFU_RQ_OPEN:
-		CurrentRequest+="Request: Opening device. \n";
+		CurrentRequest += "Request: Opening device. \n";
 		break;
 	case STDFU_RQ_CLOSE:
-		CurrentRequest+="Request: Closing device. \n";
+		CurrentRequest += "Request: Closing device. \n";
 		break;
 	case STDFU_RQ_DETACH:
-		CurrentRequest+="Request: Detach Request. \n";
+		CurrentRequest += "Request: Detach Request. \n";
 		break;
 	case STDFU_RQ_DOWNLOAD:
-		CurrentRequest+="Request: Download Request. \n";
+		CurrentRequest += "Request: Download Request. \n";
 		break;
 	case STDFU_RQ_UPLOAD:
-		CurrentRequest+="Request: Upload Request. \n";
+		CurrentRequest += "Request: Upload Request. \n";
 		break;
 	case STDFU_RQ_GET_STATUS:
-		CurrentRequest+="Request: Get Status Request. \n";
+		CurrentRequest += "Request: Get Status Request. \n";
 		break;
 	case STDFU_RQ_CLR_STATUS:
-		CurrentRequest+="Request: Clear Status Request. \n";
+		CurrentRequest += "Request: Clear Status Request. \n";
 		break;
 	case STDFU_RQ_GET_STATE:
-		CurrentRequest+="Request: Get State Request. \n";
+		CurrentRequest += "Request: Get State Request. \n";
 		break;
 	case STDFU_RQ_ABORT:
-		CurrentRequest+="Request: Abort Request. \n";
+		CurrentRequest += "Request: Abort Request. \n";
 		break;
 	case STDFU_RQ_SELECT_ALTERNATE:
-		CurrentRequest+="Request: Selecting target. \n";
+		CurrentRequest += "Request: Selecting target. \n";
 		break;
 	case STDFU_RQ_AWAITINGPNPUNPLUGEVENT:
-		CurrentRequest+="Request: Awaiting UNPLUG EVENT. \n";
+		CurrentRequest += "Request: Awaiting UNPLUG EVENT. \n";
 		break;
 	case STDFU_RQ_AWAITINGPNPPLUGEVENT:
-		CurrentRequest+="Request: Awaiting PLUG EVENT. \n";
+		CurrentRequest += "Request: Awaiting PLUG EVENT. \n";
 		break;
 	case STDFU_RQ_IDENTIFYINGDEVICE:
-		CurrentRequest+="Request: Identifying device after reenumeration. \n";
+		CurrentRequest += "Request: Identifying device after reenumeration. \n";
 		break;
 	default:
 		Tmp.Format("Request: (unknown 0x%08X). \n", pContext->CurrentRequest);
-		CurrentRequest+=Tmp;
+		CurrentRequest += Tmp;
 		break;
 	}
-	
+
 	CurrentNBlock.Format("CurrentNBlock: 0x%04X\n", pContext->CurrentNBlock);
 	CurrentLength.Format("CurrentLength: 0x%04X\n", pContext->CurrentLength);
 	Percent.Format("Percent: %i%%\n", pContext->Percent);
-	
+
 	switch (pContext->ErrorCode)
 	{
 	case STDFUPRT_NOERROR:
-		ErrorCode="Error Code: no error (!)\n";
+		ErrorCode = "Error Code: no error (!)\n";
 		break;
 	case STDFUPRT_UNABLETOLAUNCHDFUTHREAD:
-		ErrorCode="Error Code: Unable to launch operation (Thread problem)\n";
+		ErrorCode = "Error Code: Unable to launch operation (Thread problem)\n";
 		break;
 	case STDFUPRT_DFUALREADYRUNNING:
-		ErrorCode="Error Code: DFU already running\n";
+		ErrorCode = "Error Code: DFU already running\n";
 		break;
 	case STDFUPRT_BADPARAMETER:
-		ErrorCode="Error Code: Bad parameter\n";
+		ErrorCode = "Error Code: Bad parameter\n";
 		break;
 	case STDFUPRT_BADFIRMWARESTATEMACHINE:
-		ErrorCode="Error Code: Bad state machine in firmware\n";
+		ErrorCode = "Error Code: Bad state machine in firmware\n";
 		break;
 	case STDFUPRT_UNEXPECTEDERROR:
-		ErrorCode="Error Code: Unexpected error\n";
+		ErrorCode = "Error Code: Unexpected error\n";
 		break;
 	case STDFUPRT_DFUERROR:
-		ErrorCode="Error Code: DFU error\n";
+		ErrorCode = "Error Code: DFU error\n";
 		break;
 	case STDFUPRT_RETRYERROR:
-		ErrorCode="Error Code: Retry error\n";
+		ErrorCode = "Error Code: Retry error\n";
 		break;
 	default:
 		Tmp.Format("Error Code: Unknown error 0x%08X. \n", pContext->ErrorCode);
-		ErrorCode=Tmp;
+		ErrorCode = Tmp;
 	}
 
-	m_Progress.SetBkColour(COLOR_ERROR_BG);	
+	m_Progress.SetBkColour(COLOR_ERROR_BG);
 	m_Progress.SetTextBkColour(COLOR_ERROR_BG);
 	m_Progress.SetForeColour(COLOR_ERROR_FG);
 	m_Progress.SetTextForeColour(COLOR_ERROR_FG);
-	if (m_CurrentTarget>=0)
+	if (m_CurrentTarget >= 0)
 	{
 		Tmp.Format("Target %02i: %s", m_CurrentTarget, ErrorCode);
 		m_Progress.SetWindowText(Tmp);
@@ -2644,28 +2644,28 @@ void CDfuSeDemoDlg::HandleError(PDFUThreadContext pContext)
 		m_Progress.SetWindowText(ErrorCode);
 	m_Progress.SetShowText(TRUE);
 	m_BtnAbort.EnableWindow(FALSE);
-	AfxMessageBox(CurrentTarget+ErrorCode+Alternate+Operation+TransferSize+LastDFUStatus+CurrentStateMachineTransition+CurrentRequest+StartAddress+EndAddress+CurrentNBlock+CurrentLength+Percent);
+	AfxMessageBox(CurrentTarget + ErrorCode + Alternate + Operation + TransferSize + LastDFUStatus + CurrentStateMachineTransition + CurrentRequest + StartAddress + EndAddress + CurrentNBlock + CurrentLength + Percent);
 }
 
-void CDfuSeDemoDlg::OnButtonabort() 
+void CDfuSeDemoDlg::OnButtonabort()
 {
 	CString Tmp;
 	DFUThreadContext Context;
 
 	STDFUPRT_StopOperation(m_OperationCode, &Context);
 	STDFUFILES_DestroyImage(&Context.hImage);
-	if (Context.Operation==OPERATION_UPGRADE) 
-		m_BufferedImage=0;
-	if (Context.Operation==OPERATION_UPLOAD)
+	if (Context.Operation == OPERATION_UPGRADE)
+		m_BufferedImage = 0;
+	if (Context.Operation == OPERATION_UPLOAD)
 	{
-		if (m_BufferedImage!=0) // Verify
+		if (m_BufferedImage != 0) // Verify
 		{
 			STDFUFILES_DestroyImage(&m_BufferedImage);
-			m_BufferedImage=0;
+			m_BufferedImage = 0;
 		}
 	}
 
-	m_OperationCode=0;
+	m_OperationCode = 0;
 	m_Progress.SetWindowText("Operation user Aborted...");
 
 	m_CtrlDevices.EnableWindow(TRUE);
@@ -2674,127 +2674,127 @@ void CDfuSeDemoDlg::OnButtonabort()
 	m_BtnDownChoose.EnableWindow(TRUE);
 	m_CtrlDevTargets.EnableWindow(TRUE);
 	m_UpFile.GetWindowText(Tmp);
-	m_BtnUpload.EnableWindow((Tmp.GetLength()!=0) && (m_CurrDevDFUDesc.bmAttributes & ATTR_UPLOAD_CAPABLE));
+	m_BtnUpload.EnableWindow((Tmp.GetLength() != 0) && (m_CurrDevDFUDesc.bmAttributes & ATTR_UPLOAD_CAPABLE));
 	m_DownFile.GetWindowText(Tmp);
-	m_BtnUpgrade.EnableWindow((Tmp.GetLength()!=0) && (m_CurrDevDFUDesc.bmAttributes & ATTR_DNLOAD_CAPABLE));
-	m_BtnVerify.EnableWindow((Tmp.GetLength()!=0) && (m_CurrDevDFUDesc.bmAttributes & ATTR_UPLOAD_CAPABLE));
+	m_BtnUpgrade.EnableWindow((Tmp.GetLength() != 0) && (m_CurrDevDFUDesc.bmAttributes & ATTR_DNLOAD_CAPABLE));
+	m_BtnVerify.EnableWindow((Tmp.GetLength() != 0) && (m_CurrDevDFUDesc.bmAttributes & ATTR_UPLOAD_CAPABLE));
 	m_BtnAbort.EnableWindow(FALSE);
 }
 
-HBRUSH CDfuSeDemoDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor) 
+HBRUSH CDfuSeDemoDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 {
 	HBRUSH hbr = CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
 
-    switch (nCtlColor) 
+	switch (nCtlColor)
 	{
 	case CTLCOLOR_LISTBOX:
-		if (pWnd->GetDlgCtrlID()==m_CtrlDevTargets.GetDlgCtrlID())
+		if (pWnd->GetDlgCtrlID() == m_CtrlDevTargets.GetDlgCtrlID())
 		{
 			pDC->SetBkColor(GetSysColor(15));
-			hbr=(HBRUSH)m_pBkBrushReadOnly->GetSafeHandle();
+			hbr = (HBRUSH)m_pBkBrushReadOnly->GetSafeHandle();
 			break;
 		}
 		else
-		if (pWnd->GetDlgCtrlID()==m_CtrlDevices.GetDlgCtrlID())
-		{
-	        CRect rect;
-			CString Item;
-			int i;
-			int LongestWidth=0;
-			SIZE Size;
-
-            pWnd->GetWindowRect(&rect);
-
-			for (i=0;i<m_CtrlDevices.GetCount();i++)
+			if (pWnd->GetDlgCtrlID() == m_CtrlDevices.GetDlgCtrlID())
 			{
-				m_CtrlDevices.GetLBText(i, Item);
-				::GetTextExtentPoint32(pDC->m_hDC, Item, Item.GetLength(), &Size);
-				if (Size.cx>LongestWidth)
-					LongestWidth=Size.cx-50;
+				CRect rect;
+				CString Item;
+				int i;
+				int LongestWidth = 0;
+				SIZE Size;
+
+				pWnd->GetWindowRect(&rect);
+
+				for (i = 0; i < m_CtrlDevices.GetCount(); i++)
+				{
+					m_CtrlDevices.GetLBText(i, Item);
+					::GetTextExtentPoint32(pDC->m_hDC, Item, Item.GetLength(), &Size);
+					if (Size.cx > LongestWidth)
+						LongestWidth = Size.cx - 50;
+				}
+				if (rect.Width() < LongestWidth)
+				{
+					rect.right = rect.left + LongestWidth;
+					pWnd->MoveWindow(&rect);
+				}
 			}
-			if (rect.Width()<LongestWidth) 
-			{
-				rect.right = rect.left + LongestWidth;
-                pWnd->MoveWindow(&rect);
-            }
-		}
 	case CTLCOLOR_EDIT:
 		pDC->SetBkColor(RGB_BK);
-		hbr=(HBRUSH)m_pBkBrush->GetSafeHandle();
-        break;
+		hbr = (HBRUSH)m_pBkBrush->GetSafeHandle();
+		break;
 	}
 
 	return hbr;
 }
 
-void CDfuSeDemoDlg::OnDestroy() 
+void CDfuSeDemoDlg::OnDestroy()
 {
 	CDialog::OnDestroy();
 	delete m_pBkBrush;
 	delete m_pBkBrushReadOnly;
 }
 
-BOOL CDfuSeDemoDlg::OnDeviceChange(UINT nEventType,DWORD_PTR dwData)
+BOOL CDfuSeDemoDlg::OnDeviceChange(UINT nEventType, DWORD_PTR dwData)
 {
 	_DEV_BROADCAST_HEADER *hdr;
 
 	if ((nEventType == DBT_DEVICEREMOVECOMPLETE))// || (nEventType == 0x0007))
 	{
-		hdr=(_DEV_BROADCAST_HEADER*)dwData;
-		if (hdr->dbcd_devicetype==DBT_DEVTYP_DEVICEINTERFACE)
+		hdr = (_DEV_BROADCAST_HEADER*)dwData;
+		if (hdr->dbcd_devicetype == DBT_DEVTYP_DEVICEINTERFACE)
 		{
-			PDEV_BROADCAST_DEVICEINTERFACE p=(PDEV_BROADCAST_DEVICEINTERFACE)hdr;
-			if (m_OperationCode==0)
+			PDEV_BROADCAST_DEVICEINTERFACE p = (PDEV_BROADCAST_DEVICEINTERFACE)hdr;
+			if (m_OperationCode == 0)
 				Refresh();
 			else
-			if ( (strcmpi(p->dbcc_name, m_CurrDFUName)==0) )//&& (m_OperationCode!=0) )
-			{
-				CString Tmp;
-				DFUThreadContext Context;
-
-				STDFUPRT_GetOperationStatus(m_OperationCode, &Context);
-				// if operation is Detach or Return, a device removal is something standard !
-				if ( (Context.Operation!=OPERATION_RETURN) && (Context.Operation!=OPERATION_DETACH) )
+				if ((strcmpi(p->dbcc_name, m_CurrDFUName) == 0))//&& (m_OperationCode!=0) )
 				{
-					STDFUPRT_StopOperation(m_OperationCode, NULL);
-					STDFUFILES_DestroyImage(&Context.hImage);
-					if (Context.Operation==OPERATION_UPGRADE)
-						m_BufferedImage=0;
-					if (Context.Operation==OPERATION_UPLOAD)
+					CString Tmp;
+					DFUThreadContext Context;
+
+					STDFUPRT_GetOperationStatus(m_OperationCode, &Context);
+					// if operation is Detach or Return, a device removal is something standard !
+					if ((Context.Operation != OPERATION_RETURN) && (Context.Operation != OPERATION_DETACH))
 					{
-						if (m_BufferedImage!=0) // Verify
+						STDFUPRT_StopOperation(m_OperationCode, NULL);
+						STDFUFILES_DestroyImage(&Context.hImage);
+						if (Context.Operation == OPERATION_UPGRADE)
+							m_BufferedImage = 0;
+						if (Context.Operation == OPERATION_UPLOAD)
 						{
-							STDFUFILES_DestroyImage(&m_BufferedImage);
-							m_BufferedImage=0;
+							if (m_BufferedImage != 0) // Verify
+							{
+								STDFUFILES_DestroyImage(&m_BufferedImage);
+								m_BufferedImage = 0;
+							}
 						}
+						m_OperationCode = 0;
+						m_Progress.SetBkColour(COLOR_ERROR_BG);
+						m_Progress.SetTextBkColour(COLOR_ERROR_BG);
+						m_Progress.SetForeColour(COLOR_ERROR_FG);
+						m_Progress.SetTextForeColour(COLOR_ERROR_FG);
+						m_Progress.SetWindowText("Device unplugged...");
+						m_Progress.SetShowText(TRUE);
+						m_CtrlDevices.EnableWindow(TRUE);
+						m_BtnEnterApp.EnableWindow(TRUE);
+						m_BtnUpChoose.EnableWindow(TRUE);
+						m_BtnDownChoose.EnableWindow(TRUE);
+						m_CtrlDevTargets.EnableWindow(TRUE);
+						m_UpFile.GetWindowText(Tmp);
+						m_BtnUpload.EnableWindow((Tmp.GetLength() != 0) && (m_CurrDevDFUDesc.bmAttributes & ATTR_UPLOAD_CAPABLE));
+						m_DownFile.GetWindowText(Tmp);
+						m_BtnUpgrade.EnableWindow((Tmp.GetLength() != 0) && (m_CurrDevDFUDesc.bmAttributes & ATTR_DNLOAD_CAPABLE));
+						m_BtnVerify.EnableWindow((Tmp.GetLength() != 0) && (m_CurrDevDFUDesc.bmAttributes & ATTR_UPLOAD_CAPABLE));
+						m_BtnAbort.EnableWindow(FALSE);
+						Refresh();
 					}
-					m_OperationCode=0;
-					m_Progress.SetBkColour(COLOR_ERROR_BG);	
-					m_Progress.SetTextBkColour(COLOR_ERROR_BG);
-					m_Progress.SetForeColour(COLOR_ERROR_FG);
-					m_Progress.SetTextForeColour(COLOR_ERROR_FG);
-					m_Progress.SetWindowText("Device unplugged...");
-					m_Progress.SetShowText(TRUE);
-					m_CtrlDevices.EnableWindow(TRUE);
-					m_BtnEnterApp.EnableWindow(TRUE);
-					m_BtnUpChoose.EnableWindow(TRUE);
-					m_BtnDownChoose.EnableWindow(TRUE);
-					m_CtrlDevTargets.EnableWindow(TRUE);
-					m_UpFile.GetWindowText(Tmp);
-					m_BtnUpload.EnableWindow((Tmp.GetLength()!=0) && (m_CurrDevDFUDesc.bmAttributes & ATTR_UPLOAD_CAPABLE));
-					m_DownFile.GetWindowText(Tmp);
-					m_BtnUpgrade.EnableWindow((Tmp.GetLength()!=0) && (m_CurrDevDFUDesc.bmAttributes & ATTR_DNLOAD_CAPABLE));
-					m_BtnVerify.EnableWindow((Tmp.GetLength()!=0) && (m_CurrDevDFUDesc.bmAttributes & ATTR_UPLOAD_CAPABLE));
-					m_BtnAbort.EnableWindow(FALSE);
-					Refresh();
 				}
-			}
 		}
 	}
 	if ((nEventType == DBT_DEVICEARRIVAL))
 	{
-		hdr=(_DEV_BROADCAST_HEADER*)dwData;
-		if (hdr->dbcd_devicetype==DBT_DEVTYP_DEVICEINTERFACE)
+		hdr = (_DEV_BROADCAST_HEADER*)dwData;
+		if (hdr->dbcd_devicetype == DBT_DEVTYP_DEVICEINTERFACE)
 			Refresh();
 	}
 	//Refresh();
@@ -2803,47 +2803,47 @@ BOOL CDfuSeDemoDlg::OnDeviceChange(UINT nEventType,DWORD_PTR dwData)
 
 
 
-void CDfuSeDemoDlg::OnDblclkListtargets(NMHDR* pNMHDR, LRESULT* pResult) 
+void CDfuSeDemoDlg::OnDblclkListtargets(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	int Sel=m_CtrlDevTargets.GetNextItem(-1, LVNI_FOCUSED);
+	int Sel = m_CtrlDevTargets.GetNextItem(-1, LVNI_FOCUSED);
 
-	if (Sel!=-1)
+	if (Sel != -1)
 	{
-		if(ReadProtected)  
+		if (ReadProtected)
 		{
-		    if (AfxMessageBox("Your device is Read Protected.\nWould you remove the read protection?", MB_YESNO |MB_ICONQUESTION)==IDYES)
+			if (AfxMessageBox("Your device is Read Protected.\nWould you remove the read protection?", MB_YESNO | MB_ICONQUESTION) == IDYES)
 			{
 				HANDLE hdl;
-                if (STDFU_Open((LPSTR)(LPCSTR)m_CurrDFUName,&hdl)==STDFU_NOERROR)
+				if (STDFU_Open((LPSTR)(LPCSTR)m_CurrDFUName, &hdl) == STDFU_NOERROR)
 				{
-				   if (STDFU_SelectCurrentConfiguration(&hdl, 0, 0,1)==STDFU_NOERROR)
-				   {
-					   DFUSTATUS DFUStatus;
+					if (STDFU_SelectCurrentConfiguration(&hdl, 0, 0, 1) == STDFU_NOERROR)
+					{
+						DFUSTATUS DFUStatus;
 
-					   STDFU_Getstatus(&hdl, &DFUStatus);
-					   while(DFUStatus.bState != STATE_DFU_IDLE)
-					   {
+						STDFU_Getstatus(&hdl, &DFUStatus);
+						while (DFUStatus.bState != STATE_DFU_IDLE)
+						{
 							STDFU_Clrstatus(&hdl);
 							STDFU_Getstatus(&hdl, &DFUStatus);
-					   }
-						 
-					   LPBYTE m_pBuffer = (LPBYTE)malloc(0x10);
-					   memset(m_pBuffer, 0xFF, 0x10);
-					   m_pBuffer[0] = 0x92;
-					
+						}
 
-					   STDFU_Dnload(&hdl, m_pBuffer, 0x01, 0); 
+						LPBYTE m_pBuffer = (LPBYTE)malloc(0x10);
+						memset(m_pBuffer, 0xFF, 0x10);
+						m_pBuffer[0] = 0x92;
 
-					   STDFU_Getstatus(&hdl, &DFUStatus);
-					   //while(DFUStatus.bState != STATE_DFU_DOWNLOAD_BUSY)
-					   //{
-					//	  //STDFU_Clrstatus(&hdl);
-					 //		STDFU_Getstatus(&hdl, &DFUStatus);
-					  // }
-				   }
-				   STDFU_Close(&hdl);
-				   _sleep(20000);
-				   ReadProtected = FALSE;
+
+						STDFU_Dnload(&hdl, m_pBuffer, 0x01, 0);
+
+						STDFU_Getstatus(&hdl, &DFUStatus);
+						//while(DFUStatus.bState != STATE_DFU_DOWNLOAD_BUSY)
+						//{
+					 //	  //STDFU_Clrstatus(&hdl);
+					  //		STDFU_Getstatus(&hdl, &DFUStatus);
+					   // }
+					}
+					STDFU_Close(&hdl);
+					_sleep(20000);
+					ReadProtected = FALSE;
 				}
 
 			}
@@ -2884,15 +2884,14 @@ void CDfuSeDemoDlg::OnDblclkListtargets(NMHDR* pNMHDR, LRESULT* pResult)
 		else*/ // V3.0.4
 		{
 			CMappingDlg Map;
-			Map.m_MapDesc=m_CtrlDevTargets.GetItemText(Sel, 3);
+			Map.m_MapDesc = m_CtrlDevTargets.GetItemText(Sel, 3);
 			Map.DoModal();
 		}
 	}
 	*pResult = 0;
 }
 
-void CDfuSeDemoDlg::OnItemchangedListtargets(NMHDR* pNMHDR, LRESULT* pResult) 
+void CDfuSeDemoDlg::OnItemchangedListtargets(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	*pResult = 0;
 }
-
