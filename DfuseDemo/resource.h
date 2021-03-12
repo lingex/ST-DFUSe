@@ -1,4 +1,4 @@
-//{{NO_DEPENDENCIES}}
+﻿//{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
 // Used by DfuSeDemo.rc
 //
@@ -77,6 +77,7 @@
 #define IDC_WRP6_EDIT                   1065
 #define IDC_WRP8_EDIT                   1066
 #define IDC_WRP10_EDIT                  1067
+#define IDC_RUN								1068
 
 // Next default values for new objects
 // 

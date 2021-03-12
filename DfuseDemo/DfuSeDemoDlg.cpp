@@ -76,7 +76,8 @@ CDfuSeDemoDlg::CDfuSeDemoDlg(CWnd* pParent /*=NULL*/)
 	m_OptCanAccel = FALSE;
 	m_TransferOptimized = FALSE;
 	m_TimeDuration = _T("00:00:00");
-	m_Verify = FALSE;
+	m_Verify = TRUE;
+	m_Run = TRUE;
 	m_DataSize = _T("0 KB(0 Bytes) of 0 KB(0 Bytes)");
 	//}}AFX_DATA_INIT
 
@@ -133,6 +134,7 @@ void CDfuSeDemoDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECKUPGRADEOPTIMIZE, m_TransferOptimized);
 	DDX_Text(pDX, IDC_TIME_DURATION, m_TimeDuration);
 	DDX_Check(pDX, IDC_VERIFY, m_Verify);
+	DDX_Check(pDX, IDC_RUN, m_Run);
 	DDX_Text(pDX, IDC_DATA_SIZE, m_DataSize);
 	//}}AFX_DATA_MAP
 }
@@ -1521,6 +1523,11 @@ void CDfuSeDemoDlg::OnButtonupload()
 	CString Tempo;
 
 	m_CurrentTarget = m_CtrlDevTargets.GetNextItem(-1, LVIS_SELECTED);
+	if (m_CurrentTarget == -1 && m_CtrlDevTargets.GetItemCount() == 1)
+	{
+		m_CtrlDevTargets.SetItemState(0, LVIS_SELECTED, LVIS_SELECTED);
+		m_CurrentTarget = m_CtrlDevTargets.GetNextItem(-1, LVIS_SELECTED);
+	}
 	if (m_CurrentTarget == -1)
 	{
 		HandleTxtError("Please select one or several targets before !");
@@ -1640,6 +1647,11 @@ void CDfuSeDemoDlg::OnButtonverify()
 	CString Tempo, DevId, FileId;
 
 	m_CurrentTarget = m_CtrlDevTargets.GetNextItem(-1, LVIS_SELECTED);
+	if (m_CurrentTarget == -1 && m_CtrlDevTargets.GetItemCount() == 1)
+	{
+		m_CtrlDevTargets.SetItemState(0, LVIS_SELECTED, LVIS_SELECTED);
+		m_CurrentTarget = m_CtrlDevTargets.GetNextItem(-1, LVIS_SELECTED);
+	}
 	if (m_CurrentTarget == -1)
 	{
 		HandleTxtError("Please select one or several targets before !");
@@ -1813,6 +1825,11 @@ void CDfuSeDemoDlg::OnButtonupgrade()
 
 	UpdateData(TRUE);
 	m_CurrentTarget = m_CtrlDevTargets.GetNextItem(-1, LVIS_SELECTED);
+	if (m_CurrentTarget == -1 && m_CtrlDevTargets.GetItemCount() == 1)
+	{
+		m_CtrlDevTargets.SetItemState(0, LVIS_SELECTED, LVIS_SELECTED);
+		m_CurrentTarget = m_CtrlDevTargets.GetNextItem(-1, LVIS_SELECTED);
+	}
 	if (m_CurrentTarget == -1)
 	{
 		HandleTxtError("Please select one or several targets before !");
@@ -2261,7 +2278,7 @@ void CDfuSeDemoDlg::OnTimer(UINT_PTR nIDEvent)
 					{
 						if ((Context.Operation == OPERATION_UPGRADE))
 						{
-							if (m_Verify)
+							if (m_Verify)		//TODO
 							{
 								// After the upgrade , relaunch the Upgrade verify !
 								CString Tempo, DevId, FileId;
@@ -2300,6 +2317,10 @@ void CDfuSeDemoDlg::OnTimer(UINT_PTR nIDEvent)
 								}*/
 
 								LaunchVerify();
+							}
+							if (m_Run)
+							{
+								OnButtonenterapp();
 							}
 						}
 						if ((Context.Operation == OPERATION_UPLOAD) &&

@@ -1,4 +1,4 @@
-/******************** (C) COPYRIGHT 2018 STMicroelectronics ********************
+﻿/******************** (C) COPYRIGHT 2018 STMicroelectronics ********************
 * Company            : STMicroelectronics
 * Author             : MCD Application Team
 * Description        : STMicroelectronics Device Firmware Upgrade Extension Demo
@@ -34,7 +34,7 @@
 
 class CDfuSeDemoDlg : public CDialog
 {
-// Construction
+	// Construction
 public:
 	CDfuSeDemoDlg(CWnd* pParent = NULL);	// standard constructor
 // Dialog Data
@@ -74,19 +74,20 @@ public:
 	BOOL	m_TransferOptimized;
 	CString	m_TimeDuration;
 	BOOL	m_Verify;
+	BOOL	m_Run;
 	CString	m_DataSize;
 	//}}AFX_DATA
 
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CDfuSeDemoDlg)
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
 	//}}AFX_VIRTUAL
 
 // Implementation
 protected:
 	HICON m_hIcon;
-	BOOL OnDeviceChange(UINT nEventType,DWORD_PTR dwData);
+	BOOL OnDeviceChange(UINT nEventType, DWORD_PTR dwData);
 
 	// Generated message map functions
 	//{{AFX_MSG(CDfuSeDemoDlg)
@@ -134,10 +135,10 @@ private:
 	CEnumerator		m_Enum;
 	PHID_DEVICE		m_HidDevices;  // Enable to catch the HID Device structures
 	ULONG			m_HidDevice_Counter;
-	
+
 	HANDLE			m_hDle;
 	WORD			m_TransferSize;
-	int             HidDev_Counter ;
+	int             HidDev_Counter;
 
 	void Refresh();
 	void HandleError(PDFUThreadContext pContext);
