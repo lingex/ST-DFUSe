@@ -95,7 +95,7 @@ protected:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
-	afx_msg void OnButtonrefresh();
+	//afx_msg void OnButtonrefresh();
 	virtual void OnCancel();
 	afx_msg void OnSelchangeCombodevices();
 	afx_msg void OnButtonenterdfu();
@@ -111,7 +111,7 @@ protected:
 	afx_msg void OnButtonverify();
 	afx_msg void OnDblclkListtargets(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnItemchangedListtargets(NMHDR* pNMHDR, LRESULT* pResult);
-	afx_msg void OnErase();
+	//afx_msg void OnErase();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 private:

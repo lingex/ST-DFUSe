@@ -435,11 +435,6 @@ void CDfuSeDemoDlg::Refresh()
 
 	m_CtrlDevices.SetCurSel(Sel);
 	OnSelchangeCombodevices();
-
-	if (m_Auto && Sel != 0)
-	{
-		OnButtonupgrade();
-	}
 }
 
 void CDfuSeDemoDlg::OnCancel()
@@ -532,7 +527,9 @@ void CDfuSeDemoDlg::OnSelchangeCombodevices()
 	}
 	m_CtrlDevTargets.DeleteAllItems();
 
-	UpdateData(FALSE);
+	//UpdateData(FALSE);		//variable to checkbox
+	UpdateData(TRUE);			//checkout to veriable
+
 	if (Sel != LB_ERR)
 	{
 		if (Sel >= (int)m_HidDevice_Counter)
@@ -2824,6 +2821,11 @@ BOOL CDfuSeDemoDlg::OnDeviceChange(UINT nEventType, DWORD_PTR dwData)
 		hdr = (_DEV_BROADCAST_HEADER*)dwData;
 		if (hdr->dbcd_devicetype == DBT_DEVTYP_DEVICEINTERFACE)
 			Refresh();
+		if (m_Auto && m_CtrlDevTargets.GetItemCount() == 1 && m_DownFileName != "")
+		{
+			Sleep(1000);
+			OnButtonupgrade();
+		}
 	}
 	//Refresh();
 	return TRUE;
