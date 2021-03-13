@@ -14,5 +14,6 @@ STM32 系列单片机的 DFU 升级工具, 基于 STMicroelectronics 提供的 D
 5.修复了 CHECKBOX 状态同步错误问题.
 
 
+# 软件截图
 
 ![image](https://github.com/lingex/ST-DFUSe/blob/main/Pic/V3.0.8.jpg)
