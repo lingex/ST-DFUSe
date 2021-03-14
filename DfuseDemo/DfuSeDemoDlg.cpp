@@ -527,8 +527,7 @@ void CDfuSeDemoDlg::OnSelchangeCombodevices()
 	}
 	m_CtrlDevTargets.DeleteAllItems();
 
-	//UpdateData(FALSE);		//variable to checkbox
-	UpdateData(TRUE);			//checkout to veriable
+	UpdateData(FALSE);
 
 	if (Sel != LB_ERR)
 	{
@@ -2824,6 +2823,7 @@ BOOL CDfuSeDemoDlg::OnDeviceChange(UINT nEventType, DWORD_PTR dwData)
 		if (m_Auto && m_CtrlDevTargets.GetItemCount() == 1 && m_DownFileName != "")
 		{
 			Sleep(1000);
+			UpdateData(TRUE);			//checkox to veriable
 			OnButtonupgrade();
 		}
 	}
