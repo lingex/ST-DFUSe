@@ -80,7 +80,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 IDD_DfuSeDemo_DIALOG DIALOGEX 0, 0, 375, 331
 STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_CENTER | WS_MINIMIZEBOX | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_CLIENTEDGE | WS_EX_CONTROLPARENT | WS_EX_APPWINDOW
-CAPTION "DfuSe Lingex Build (v3.0.8)"
+CAPTION "DfuSe Lingex Build (v3.0.9)"
 FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     GROUPBOX        "Available DFU Devices",IDC_STATIC,5,6,365,73
@@ -288,8 +288,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 3,0,8,0
- PRODUCTVERSION 3,0,8,0
+ FILEVERSION 3,0,9,0
+ PRODUCTVERSION 3,0,9,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -306,12 +306,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "STMicroelectronics"
             VALUE "FileDescription", "DfuSe Tool"
-            VALUE "FileVersion", "3, 0, 8, 0"
+            VALUE "FileVersion", "3, 0, 9, 0"
             VALUE "InternalName", "DfuSeTool"
-            VALUE "LegalCopyright", "Copyright © 2018"
+            VALUE "LegalCopyright", "Copyright © 2020"
             VALUE "OriginalFilename", "DfuSeTool.exe"
             VALUE "ProductName", "DfuSe Application"
-            VALUE "ProductVersion", "3, 0, 8, 0"
+            VALUE "ProductVersion", "3, 0, 9, 0"
         END
     END
     BLOCK "VarFileInfo"
