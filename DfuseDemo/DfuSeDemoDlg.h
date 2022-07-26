@@ -111,6 +111,7 @@ protected:
 	afx_msg void OnButtonverify();
 	afx_msg void OnDblclkListtargets(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnItemchangedListtargets(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnCheckBoxChange();
 	//afx_msg void OnErase();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()

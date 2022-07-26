@@ -161,6 +161,9 @@ BEGIN_MESSAGE_MAP(CDfuSeDemoDlg, CDialog)
 	ON_NOTIFY(LVN_ITEMCHANGED, IDC_LISTTARGETS, OnItemchangedListtargets)
 	//}}AFX_MSG_MAP
 	ON_WM_DEVICECHANGE()
+	ON_BN_CLICKED(IDC_AUTO, OnCheckBoxChange)
+	ON_BN_CLICKED(IDC_RUN, OnCheckBoxChange)
+	ON_BN_CLICKED(IDC_CHECKUPGRADEOPTIMIZE, OnCheckBoxChange)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -2823,7 +2826,7 @@ BOOL CDfuSeDemoDlg::OnDeviceChange(UINT nEventType, DWORD_PTR dwData)
 		if (m_Auto && m_CtrlDevTargets.GetItemCount() == 1 && m_DownFileName != "")
 		{
 			Sleep(1000);
-			UpdateData(TRUE);			//checkox to veriable
+			UpdateData(TRUE);			//checkbox to veriable
 			OnButtonupgrade();
 		}
 	}
@@ -2924,4 +2927,9 @@ void CDfuSeDemoDlg::OnDblclkListtargets(NMHDR* pNMHDR, LRESULT* pResult)
 void CDfuSeDemoDlg::OnItemchangedListtargets(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	*pResult = 0;
+}
+
+void CDfuSeDemoDlg::OnCheckBoxChange()
+{
+	UpdateData(TRUE);
 }
